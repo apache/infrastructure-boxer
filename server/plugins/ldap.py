@@ -46,7 +46,7 @@ class LDAPClient:
     def __init__(self, config: LDAPConfig, ldap_override_yaml="projects.yaml"):
         self.config = config
         self.client = None
-        self.connnection = None
+        self.connection = None
         self.ldap_override = {}
         if ldap_override_yaml and os.path.exists(ldap_override_yaml):
             try:
