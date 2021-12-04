@@ -140,6 +140,8 @@ async def compile_data(
     async with plugins.ldap.LDAPClient(ldap) as lc:
         for repo in repositories:
             project = repo.project
+            if not project:
+                continue
             if project not in org.projects:
                 committers, pmc = await lc.get_members(project)
                 if committers and pmc:
