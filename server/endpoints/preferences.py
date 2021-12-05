@@ -25,6 +25,7 @@ async def process(
     server: plugins.basetypes.Server, session: plugins.session.SessionObject, indata: dict
 ) -> dict:
     github_data = None
+
     in_github_org = False
     if session.credentials and session.credentials.github_login in server.data.mfa:
         in_github_org = True
@@ -36,7 +37,13 @@ async def process(
                     "mfa": p.github_mfa,
                     "login": p.github_login,
                 }
-    prefs: dict = {"credentials": {}, "github": github_data}
+    pmcs = []
+    if session.credentials:
+        for project, data in server.data.pmcs.items():
+            if session.credentials.uid in data:
+                pmcs.append(project)
+
+    prefs: dict = {"credentials": {}, "github": github_data, "pmcs": pmcs}
     if session and session.credentials:
         prefs['credentials'] = {
             "admin": session.credentials.admin,
