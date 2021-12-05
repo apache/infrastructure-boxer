@@ -9,6 +9,7 @@ import plugins.database
 import plugins.repositories
 import plugins.projects
 import plugins.github
+import aiohttp
 
 
 class ProgTimer:
@@ -168,6 +169,18 @@ async def run_tasks(server: plugins.basetypes.Server):
 
         async with ProgTimer("Looking for missing/invalid GitHub teams"):
             await asf_github_org.setup_teams(server.data.projects)
+
+        async with ProgTimer("Fetching latest LDAP data via Whimsy"):
+            try:
+                session_timeout = aiohttp.ClientTimeout(total=None, sock_connect=15, sock_read=15)
+                url = "https://whimsy.apache.org/public/public_ldap_projects.json"
+                async with aiohttp.client.ClientSession(timeout=session_timeout) as hc:
+                    rv = await hc.get(url)
+                    js = await rv.json()
+                    for project, data in js['projects'].items():
+                        server.data.pmcs[project] = data.get("members", [])
+            except aiohttp.ClientError:
+                pass
 
         await adjust_teams(server)
         await adjust_repositories(server)
