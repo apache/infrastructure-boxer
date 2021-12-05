@@ -72,4 +72,5 @@ class InterData:
         self.projects: dict = {}
         self.mfa: dict = {}
         self.teams: typing.List[plugins.github.GitHubTeam] = []
+        self.pmcs = {}
 
