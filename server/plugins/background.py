@@ -178,7 +178,7 @@ async def run_tasks(server: plugins.basetypes.Server):
                     rv = await hc.get(url)
                     js = await rv.json()
                     for project, data in js['projects'].items():
-                        server.data.pmcs[project] = data.get("members", [])
+                        server.data.pmcs[project] = data.get("owners", [])
             except aiohttp.ClientError:
                 pass
 
