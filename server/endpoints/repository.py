@@ -23,9 +23,24 @@ import os
 import aiohttp.client
 import asyncio
 import shutil
+import asfpy.messaging
 
 GIT_EXEC = shutil.which("git")
 GB_CLONE_EXEC = "/x1/gitbox/bin/gitbox-clone"
+NEW_REPO_NOTIFY = 'private@infra.apache.org'
+NEW_REPO_NOTIFY_MSG = """
+A new repository has been set up by %(uid)s@apache.org: %(reponame)s
+
+Commit mail target: %(commit_mail)s
+Dev/issue mail target: %(issue_mail)s
+
+The repository can be found at:
+GitBox: %(repourl_gb)s
+GitHub: %(repourl_gh)s
+
+With regards,
+Boxer Git Management Services
+"""
 
 """ Repository editor endpoint for Boxer"""
 
@@ -39,6 +54,7 @@ async def process(
     action = indata.get("action")
     if action == "create":
         reponame = indata.get("repository")
+        uid = session.credentials.uid
         private = indata.get("private", False)
         m = re.match(r"^([a-z0-9]+)(-[-0-9a-z]+)?\.git$", reponame)  # httpd.git or sling-foo.git etc
         if not m:
@@ -47,18 +63,22 @@ async def process(
         title = indata.get("title", "Apache %s" % pmc)
 
         # Check LDAP ownership
-        async with plugins.ldap.LDAPClient(server.config.ldap) as lc:
-            committer_list, pmc_list = await lc.get_members(pmc)
-            if not pmc_list:
-                return {"okay": False, "message": "Invalid project prefix '%s' specified" % pmc}
-            if session.credentials.uid not in pmc_list:
-                return {"okay": False, "message": "Only (I)PMC members of this project may create repositories"}
+        if not session.credentials.admin:
+            async with plugins.ldap.LDAPClient(server.config.ldap) as lc:
+                committer_list, pmc_list = await lc.get_members(pmc)
+                if not pmc_list:
+                    return {"okay": False, "message": "Invalid project prefix '%s' specified" % pmc}
+                if session.credentials.uid not in pmc_list:
+                    return {"okay": False, "message": "Only (I)PMC members of this project may create repositories"}
 
+        repourl_gh = f"https://github.com/{server.config.github.org}/{reponame}"
+        repourl_gb = f"https://gitbox-test.apache.org/repos/asf/{reponame}"
         if not private:
             repo_path = os.path.join(server.config.repos.public, reponame)
             if os.path.exists(repo_path):
                 return {"okay": False, "message": "A repository by that name already exists"}
         else:
+            repourl_gb = f"https://gitbox-test.apache.org/repos/private/{pmc}/{reponame}"
             repo_path = os.path.join(server.config.repos.private, pmc, reponame)
             pmc_dir = os.path.join(server.config.repos.private, pmc)
             if not os.path.isdir(pmc_dir):
@@ -81,11 +101,17 @@ async def process(
             stdout, stderr = await proc.communicate()
             # Everything went okay?
             if proc.returncode == 0:
+                asfpy.messaging.mail(
+                    recipient = NEW_REPO_NOTIFY,
+                    subject = f"New GitBox/GitHub repository set up: {reponame}" ,
+                    message = NEW_REPO_NOTIFY_MSG % locals()
+                )
                 return {"okay": True, "message": "Repository created!"}
             else:
                 return {"okay": False, "message": str(stderr)}
         else:
             return {"okay": False, "message": rv}
+
 
 async def create_repo(server, repo, title, pmc, private = False):
     url = "https://api.github.com/orgs/%s/repos" % server.config.github.org
