@@ -177,8 +177,12 @@ async def run_tasks(server: plugins.basetypes.Server):
                 async with aiohttp.client.ClientSession(timeout=session_timeout) as hc:
                     rv = await hc.get(url)
                     js = await rv.json()
+                    podlings = []
                     for project, data in js['projects'].items():
                         server.data.pmcs[project] = data.get("owners", [])
+                        if data.get("podling") == "current":
+                            podlings.append(project)
+                    server.data.podlings = podlings
             except aiohttp.ClientError:
                 pass
 
