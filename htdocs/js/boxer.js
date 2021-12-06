@@ -9,6 +9,7 @@ let br = (a) => document.createElement('br');
 let h2 = (a) => {let x = document.createElement('h2'); x.innerText = a ? a : ""; return x}
 let h1 = (a) => {let x = document.createElement('h1'); x.innerText = a ? a : ""; return x}
 
+let login_cached = {};
 
 function blurbg(blur = false) {
     if (blur) document.body.setAttribute("class", "blurbg");
@@ -402,6 +403,194 @@ function search_page(canvas, query) {
 
 }
 
+function kvpair(a, b) {
+    let maindiv = document.createElement('div');
+    let adiv = document.createElement('div');
+    let bdiv = document.createElement('div');
+    maindiv.style.width = "500px";
+    adiv.style.width = "300px";
+    bdiv.style.width = "200px";
+    adiv.style.display = "inline-block";
+    bdiv.style.display = "inline-block";
+    adiv.appendChild(a);
+    bdiv.appendChild(b);
+    maindiv.appendChild(adiv);
+    maindiv.appendChild(bdiv);
+    return maindiv
+}
+
+
+function new_repo_prompt(canvas, login) {
+    canvas.innerText = '';
+
+    let title = document.createElement('h2');
+    title.innerText = "Create a git repository:";
+    canvas.appendChild(title);
+
+    // Project dropdown
+    let sel = document.createElement('select');
+    sel.setAttribute('id', 'project');
+    sel.setAttribute("onchange", "prep_new_repo(true);")
+    let dl = document.createElement('option');
+    dl.innerText = "--- Select a project ---";
+    dl.disabled = false;
+    dl.value = "";
+    sel.appendChild(dl);
+    for (let project of login.all_projects) {
+        let disabled = true;
+        if (login.credentials.admin || login.pmcs.includes(project)) {
+            disabled = false;
+        }
+        let l = document.createElement('option');
+        l.innerText = project;
+        l.disabled = disabled;
+        sel.appendChild(l);
+    }
+    let label = document.createElement('label');
+    label.setAttribute("for", "project");
+    label.innerText = "Project: ";
+    canvas.appendChild(kvpair(label, sel));
+
+
+    // Suffix?
+    canvas.appendChild(br());
+    let suffix = document.createElement('input');
+    suffix.setAttribute("type" , "text");
+    suffix.setAttribute("id" , "suffix");
+    suffix.setAttribute("onkeyup", "prep_new_repo();")
+    label = document.createElement('label');
+    label.setAttribute("for", "suffix");
+    label.innerText = "Optional repo sub-name: ";
+    canvas.appendChild(kvpair(label, suffix));
+
+    // Private?
+    if (login_cached.credentials.admin) {
+        canvas.appendChild(br());
+        let priv = document.createElement('input');
+        priv.setAttribute("type" , "checkbox");
+        priv.setAttribute("id" , "private");
+        priv.setAttribute("onchange", "prep_new_repo();")
+        label = document.createElement('label');
+        label.style.color = 'maroon';
+        label.setAttribute("for", "private");
+        label.innerText = "Make repository private*: ";
+        canvas.appendChild(kvpair(label, priv));
+    }
+
+    // Commit mail target
+    canvas.appendChild(br());
+    let commit = document.createElement('input');
+    commit.setAttribute("type" , "text");
+    commit.style.width = "200px";
+    commit.setAttribute("id" , "commit");
+    commit.setAttribute("onkeyup", "prep_new_repo();")
+    label = document.createElement('label');
+    label.setAttribute("for", "commit");
+    label.innerText = "Commit mailing list target: ";
+    canvas.appendChild(kvpair(label, commit));
+
+    // Dev mail target
+    canvas.appendChild(br());
+    let dev = document.createElement('input');
+    dev.setAttribute("type" , "text");
+    dev.setAttribute("id" , "dev");
+    dev.style.width = "200px";
+    dev.setAttribute("onkeyup", "prep_new_repo();")
+    label = document.createElement('label');
+    label.setAttribute("for", "dev");
+    label.innerText = "Issue/PR mailing list target: ";
+    canvas.appendChild(kvpair(label, dev));
+
+
+    // Repo result
+    canvas.appendChild(br());
+    let final_repo_name = document.createElement('div');
+    final_repo_name.style.padding = '10px'
+    final_repo_name.style.color = 'blue'
+    final_repo_name.setAttribute("id", "final_repo_name");
+    canvas.appendChild(final_repo_name);
+
+    // Submit button
+    let sbmt = document.createElement('input');
+    sbmt.setAttribute("type" ,"submit");
+    sbmt.setAttribute("id" ,"sbmt");
+    sbmt.disabled = true;
+    sbmt.value = "Create repository";
+    let txt = document.createTextNode('');
+    canvas.appendChild(kvpair(txt, sbmt));
+
+    if (login_cached.credentials.admin) {
+        canvas.appendChild(br());
+        let privwarn = document.createElement('p');
+        privwarn.style.fontSize = "0.75rem"
+        privwarn.innerText = "*Private repositories are only visible to the (P)PMC of a project. This applies to both gitbox and github";
+        canvas.appendChild(privwarn)
+        canvas.appendChild(br());
+    }
+
+    canvas.appendChild(br());
+    let a = document.createElement('a');
+    a.setAttribute("href" , "https://s.apache.org/asfyaml");
+    a.innerText = ".asf.yaml";
+    canvas.appendChild(document.createTextNode("You may fine tune these settings later using "));
+    canvas.appendChild(a);
+    canvas.appendChild(document.createTextNode(" in the main branch of your repository."));
+}
+
+
+function prep_new_repo(refresh=false, submit=false) {
+    let frn = document.getElementById('final_repo_name');
+    let project = document.getElementById('project').value;
+    let suffix = document.getElementById('suffix').value;
+    let priv = login_cached.credentials.admin ? document.getElementById('private').checked : false;
+    document.getElementById('sbmt').disabled = true;
+    if (!project.length) {
+        frn.innerText = "Please select a project";
+        return
+    }
+    if (refresh) {
+        document.getElementById('commit').value = `commits@${project}.apache.org`;
+        document.getElementById('dev').value = `dev@${project}.apache.org`;
+    }
+    if (!suffix.match(/^[-a-z0-9]*$/)) {
+        frn.innerText = "Invalid repository suffix. Must be alphanumeric characters or dashes only.";
+        return
+    }
+    if (login_cached.podlings.includes(project)) {
+        project = 'incubator-' + project;
+    }
+    let repo_name = project;
+    if (suffix && suffix.length) {
+        repo_name += "-" + suffix;
+    }
+    repo_name += ".git";
+    let repo_url_gitbox = "https://gitbox.apache.org/repos/" + ( priv ? "private/" + project : "asf") + "/" + repo_name;
+    let repo_url_github= "https://github.com/apache/" + repo_name;
+    frn.innerText = `This will create a repository named ${repo_name}`;
+    document.getElementById('sbmt').disabled = false;
+    if (submit) {
+        if (window.confirm(`This will create ${repo_name}. Are you sure you wish to continue?`)) {
+            create_new_repo(project, repo_name, priv, repo_title, repo_commit, repo_dev);
+        }
+    }
+}
+
+
+async function create_new_repo(project, name, priv, title, commit, dev) {
+    let rv = await POST("/api/repository" , {
+            action: 'create' ,
+            repository: name,
+            private: priv,
+            title: title,
+            commit: commit,
+            issue: dev
+        });
+    if (rv.okay == true) {
+        let repo_url_gitbox = "https://gitbox.apache.org/repos/" + ( priv ? "private/" + project : "asf") + "/" + name;
+        let repo_url_github= "https://github.com/apache/" + name;
+    }
+}
+
 
 async function prime() {
 
@@ -418,6 +607,7 @@ async function prime() {
     }
     // Fetch prefs, see if we're authed
     let login = await GET("/api/preferences.json");
+    login_cached = login;
 
     // If OAuth call, bypass the prefs check
     if (formdata.action == "oauth") {
@@ -438,29 +628,31 @@ async function prime() {
     }
 
 
-    // Not authed via GitHub yet
-    if (!login.github || !login.github.login) {
-        setup_step_one_github_auth(canvas, login);
-        return
-    }
-
-    // Authed via GitHub but not in Apache Org yet
-    if (login.credentials && !login.credentials.github_org_member) {
-        setup_step_two_github_org(canvas, login);
-        return
-    }
-
-    // MFA not enabled yet
-    if (!login.github.mfa) {
-        setup_step_three_mfa(canvas, login);
-        return
-    }
 
     if (!formdata.action || formdata.action == 'preferences') {
+        // Not authed via GitHub yet
+        if (!login.github || !login.github.login) {
+            setup_step_one_github_auth(canvas, login);
+            return
+        }
+
+        // Authed via GitHub but not in Apache Org yet
+        if (login.credentials && !login.credentials.github_org_member) {
+            setup_step_two_github_org(canvas, login);
+            return
+        }
+
+        // MFA not enabled yet
+        if (!login.github.mfa) {
+            setup_step_three_mfa(canvas, login);
+            return
+        }
         show_page_profile(canvas, login);
         return
     } else if (formdata.action == 'search') {
         search_page(canvas, formdata.query||"");
+    } else if (formdata.action == 'newrepo') {
+        new_repo_prompt(canvas, login);
     }
 }
 
