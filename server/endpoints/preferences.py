@@ -43,7 +43,7 @@ async def process(
             if session.credentials.uid in data:
                 pmcs.append(project)
 
-    prefs: dict = {"credentials": {}, "github": github_data, "pmcs": pmcs}
+    prefs: dict = {"credentials": {}, "github": github_data, "pmcs": pmcs, "all_projects": list(server.data.pmcs.keys())}
     if session and session.credentials:
         prefs['credentials'] = {
             "admin": session.credentials.admin,
