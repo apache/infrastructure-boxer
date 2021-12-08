@@ -95,6 +95,8 @@ async def process(
             if os.path.exists(repo_path):
                 return {"okay": False, "message": "A repository by that name already exists"}
         else:
+            if not session.credentials.admin:
+                return {"okay": False, "message": "Private repositories can only be created by Infrastructure staff"}
             repourl_gb = f"https://gitbox-test.apache.org/repos/private/{pmc}/{reponame}"
             repo_path = os.path.join(server.config.repos.private, pmc, reponame)
             pmc_dir = os.path.join(server.config.repos.private, pmc)
