@@ -514,6 +514,7 @@ function new_repo_prompt(canvas, login) {
     let sbmt = document.createElement('input');
     sbmt.setAttribute("type" ,"submit");
     sbmt.setAttribute("id" ,"sbmt");
+    sbmt.setAttribute("onclick" ,"prep_new_repo(false, true);");
     sbmt.disabled = true;
     sbmt.value = "Create repository";
     let txt = document.createTextNode('');
@@ -543,6 +544,9 @@ function prep_new_repo(refresh=false, submit=false) {
     let project = document.getElementById('project').value;
     let suffix = document.getElementById('suffix').value;
     let priv = login_cached.credentials.admin ? document.getElementById('private').checked : false;
+    let repo_title = 'Apache ' + project;
+    let repo_commit = document.getElementById('commit').value;
+    let repo_dev = document.getElementById('dev').value;
     document.getElementById('sbmt').disabled = true;
     if (!project.length) {
         frn.innerText = "Please select a project";
@@ -577,7 +581,8 @@ function prep_new_repo(refresh=false, submit=false) {
 
 
 async function create_new_repo(project, name, priv, title, commit, dev) {
-    let rv = await POST("/api/repository" , {
+    blurbg(true);
+    let rv = await POST("/api/repository.json" , {
             action: 'create' ,
             repository: name,
             private: priv,
@@ -585,9 +590,29 @@ async function create_new_repo(project, name, priv, title, commit, dev) {
             commit: commit,
             issue: dev
         });
+    blurbg(false);
     if (rv.okay == true) {
-        let repo_url_gitbox = "https://gitbox.apache.org/repos/" + ( priv ? "private/" + project : "asf") + "/" + name;
-        let repo_url_github= "https://github.com/apache/" + name;
+        let canvas = document.getElementById('main');
+        let repo_url_gitbox = "https://gitbox-test.apache.org/repos/" + ( priv ? "private/" + project : "asf") + "/" + name;
+        let repo_url_github= "https://github.com/asftest/" + name;
+        canvas.innerText = 'Your repository has been created and will be available for use within a few minutes.';
+        canvas.appendChild(br());
+        canvas.appendChild(document.createTextNode("Your project is available on gitbox at: "));
+        let gburl = document.createElement('a');
+        gburl.setAttribute("href" ,repo_url_gitbox);
+        gburl.innerText = repo_url_gitbox;
+        canvas.appendChild(gburl);
+        canvas.appendChild(br());
+        canvas.appendChild(document.createTextNode("Your project is available on GitHub at: "));
+        let ghurl = document.createElement('a');
+        ghurl.setAttribute("href" ,repo_url_github);
+        ghurl.innerText = repo_url_github;
+        canvas.appendChild(ghurl);
+        canvas.appendChild(br());
+        canvas.appendChild(document.createTextNode("User permissions should be set up within the next five minutes. If not, please let us know at: users@infra.apache.org"));
+
+    } else {
+        alert(rv.message);
     }
 }
 
