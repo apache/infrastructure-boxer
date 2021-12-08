@@ -44,6 +44,23 @@ Boxer Git Management Services
 
 """ Repository editor endpoint for Boxer"""
 
+GB_GITWEB_PATH = "/x1/gitbox/conf/httpd/gitweb.%(pmc)s.pl"
+GB_GITWEB_CONFIG = """
+our $projectroot = "/x1/repos/private/%(pmc)s";
+our $site_name = "Private repositories for Apache%(pmc)s";
+our $site_header = "<h1>Apache %(pmc)s Private Git Repos</h1>";
+
+# Fix URLs for static assests to simplify the
+# httpd configuration.
+our @stylesheets = ("/static/gitweb.css");
+our $logo = "/static/git-logo.png";
+our $favicon = "/static/git-favicon.png";
+our $javascript = "/static/gitweb.js";
+$feature{'avatar'}{'default'} = ['gravatar'];
+$feature{'highlight'}{'default'} = [1];
+
+"""
+
 
 async def process(
         server: plugins.basetypes.Server, session: plugins.session.SessionObject, indata: dict
@@ -91,6 +108,10 @@ async def process(
         issue_mail = indata.get("issue", "dev@%s.apache.org" % pmc)
 
         # Create the repo
+        if private and GB_GITWEB_PATH:
+            with open(GB_GITWEB_PATH % locals(), "w") as f:
+                f.write(GB_GITWEB_CONFIG % locals())
+                f.close()
         rv = await create_repo(server, reponame, title, pmc, private)
         if rv is True:
             params = ['-c', commit_mail, '-d', title, "git@github.com:%s/%s" % (server.config.github.org, reponame),
@@ -102,7 +123,7 @@ async def process(
             # Everything went okay?
             if proc.returncode == 0:
                 asfpy.messaging.mail(
-                    recipient = NEW_REPO_NOTIFY,
+                    recipients = [NEW_REPO_NOTIFY, f"private@{pmc}.apache.org"],
                     subject = f"New GitBox/GitHub repository set up: {reponame}" ,
                     message = NEW_REPO_NOTIFY_MSG % locals()
                 )
