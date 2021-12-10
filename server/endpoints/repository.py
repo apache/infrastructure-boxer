@@ -124,10 +124,14 @@ async def process(
             stdout, stderr = await proc.communicate()
             # Everything went okay?
             if proc.returncode == 0:
+                # Add the apache.dev setting
+                with open(os.path.join(repo_path, "config"), "a") as f:
+                    f.write("\n[apache]\n    dev = %s\n" % issue_mail)
+                    f.close()
                 asfpy.messaging.mail(
-                    recipients = [NEW_REPO_NOTIFY, f"private@{pmc}.apache.org"],
-                    subject = f"New GitBox/GitHub repository set up: {reponame}" ,
-                    message = NEW_REPO_NOTIFY_MSG % locals()
+                    recipients=[NEW_REPO_NOTIFY, f"private@{pmc}.apache.org"],
+                    subject=f"New GitBox/GitHub repository set up: {reponame}",
+                    message=NEW_REPO_NOTIFY_MSG % locals()
                 )
                 return {"okay": True, "message": "Repository created!"}
             else:
