@@ -100,8 +100,36 @@ async def process(
             repourl_gb = f"https://gitbox-test.apache.org/repos/private/{pmc}/{reponame}"
             repo_path = os.path.join(server.config.repos.private, pmc, reponame)
             pmc_dir = os.path.join(server.config.repos.private, pmc)
+            # If PMC dir does not exist, create it and plop in a .htaccess file for auth
             if not os.path.isdir(pmc_dir):
                 os.mkdir(pmc_dir)
+                htaccess = f"""
+SetEnv GIT_PROJECT_ROOT {pmc_dir}
+SetEnv GITWEB_CONFIG /x1/gitbox/conf/httpd/gitweb.{pmc}.pl
+AuthType Basic
+AuthName "ASF Private Repos for {pmc}"
+AuthBasicProvider ldap
+AuthLDAPUrl "ldaps://ldap-eu-ro.apache.org/ou=people,dc=apache,dc=org?uid"
+AuthLDAPGroupAttribute owner
+AuthLDAPGroupAttributeIsDN on
+Require ldap-group cn={pmc},ou=project,ou=groups,dc=apache,dc=org
+"""
+                gitwebconf = f"""
+our $projectroot = "{pmc_dir}";
+our $site_name = "Private repositories for {pmc}";
+our $site_header = "<h1>ASF Private Git Repositories for {pmc}</h1>";
+our @stylesheets = ("/static/gitweb.css");
+our $logo = "/static/git-logo.png";
+our $favicon = "/static/git-favicon.png";
+our $javascript = "/static/gitweb.js";
+"""
+                with open(f"/x1/gitbox/conf/httpd/gitweb.{pmc}.pl", "w") as f:
+                    f.write(gitwebconf)
+                    f.close()
+                with open(os.path.join(pmc_dir, '.htaccess'), "w") as f:
+                    f.write(htaccess)
+                    f.close()
+
             if os.path.exists(repo_path):
                 return {"okay": False, "message": "A repository by that name already exists"}
 
