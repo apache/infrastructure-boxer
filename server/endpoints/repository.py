@@ -104,15 +104,15 @@ async def process(
             if not os.path.isdir(pmc_dir):
                 os.mkdir(pmc_dir)
                 htaccess = f"""
-SetEnv GIT_PROJECT_ROOT {pmc_dir}
-SetEnv GITWEB_CONFIG /x1/gitbox/conf/httpd/gitweb.{pmc}.pl
+<Location /repos/private/{pmc}>
 AuthType Basic
-AuthName "ASF Private Repos for {pmc}"
+AuthName "ASF Private Repos for Apache {pmc}"
 AuthBasicProvider ldap
 AuthLDAPUrl "ldaps://ldap-eu-ro.apache.org/ou=people,dc=apache,dc=org?uid"
 AuthLDAPGroupAttribute owner
 AuthLDAPGroupAttributeIsDN on
 Require ldap-group cn={pmc},ou=project,ou=groups,dc=apache,dc=org
+</Location>
 """
                 gitwebconf = f"""
 our $projectroot = "{pmc_dir}";
@@ -126,7 +126,7 @@ our $javascript = "/static/gitweb.js";
                 with open(f"/x1/gitbox/conf/httpd/gitweb.{pmc}.pl", "w") as f:
                     f.write(gitwebconf)
                     f.close()
-                with open(os.path.join(pmc_dir, '.htaccess'), "w") as f:
+                with open(f"/x1/gitbox/conf/httpd/htaccess.{pmc}" "w") as f:
                     f.write(htaccess)
                     f.close()
 
