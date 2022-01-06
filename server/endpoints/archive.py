@@ -33,7 +33,7 @@ async def process(
 
     # Ensure repo exists
     repo = indata.get("repository")
-    if not repo or repo not in server.data.repositories:
+    if not repo or not any(x.filename == repo for x in server.data.repositories):
         return {"okay": False, "message": "Invalid repository specified."}
 
     # Archive on GitHub:
@@ -41,8 +41,9 @@ async def process(
         login=server.config.github.org, personal_access_token=server.config.github.token
     )
     try:
-        asf_github_org.api_patch(f"https://api.github.com/repos/{server.config.github.org}/{repo}", {"archived": True})
-    except AssertionError:
+        await asf_github_org.get_id()  # Must be called in order to elevate access.
+        await asf_github_org.api_patch(f"https://api.github.com/repos/{server.config.github.org}/{repo}", {"archived": True})
+    except AssertionError as e:
         return {"okay": False, "message": "Could not archive repository on GitHub."}
 
     # Archive on GitBox:
@@ -57,6 +58,7 @@ async def process(
         f.write(f"Archived at {now} by {session.credentials.uid} ({session.credentials.name})\n")
         f.close()
 
+    return {"okay": True, "message": "Repository successfully archived."}
 
 def register(server: plugins.basetypes.Server):
     return plugins.basetypes.Endpoint(process)
