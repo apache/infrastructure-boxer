@@ -116,8 +116,8 @@ Require ldap-group cn={pmc},ou=project,ou=groups,dc=apache,dc=org
 """
                 gitwebconf = f"""
 our $projectroot = "{pmc_dir}";
-our $site_name = "Private repositories for {pmc}";
-our $site_header = "<h1>ASF Private Git Repositories for {pmc}</h1>";
+our $site_name = "Private repositories for Apache {pmc}";
+our $site_header = "<h1>ASF Private Git Repositories for Apache {pmc}</h1>";
 our @stylesheets = ("/static/gitweb.css");
 our $logo = "/static/git-logo.png";
 our $favicon = "/static/git-favicon.png";
@@ -126,9 +126,17 @@ our $javascript = "/static/gitweb.js";
                 with open(f"/x1/gitbox/conf/httpd/gitweb.{pmc}.pl", "w") as f:
                     f.write(gitwebconf)
                     f.close()
-                with open(f"/x1/gitbox/conf/httpd/htaccess.{pmc}" "w") as f:
+                with open(f"/x1/gitbox/conf/httpd/htaccess.{pmc}", "w") as f:
                     f.write(htaccess)
                     f.close()
+
+                proc = await asyncio.create_subprocess_exec(
+                        '/usr/sbin/service', 'apache2', 'graceful',
+                    stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+                    )
+                stdout, stderr = await proc.communicate()
+                if proc.returncode != 0:
+                    return {"okay": False, "message": "Could not apply pre-create security controls: " + stderr.encode("utf-8")}
 
             if os.path.exists(repo_path):
                 return {"okay": False, "message": "A repository by that name already exists"}
