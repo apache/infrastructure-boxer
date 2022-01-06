@@ -54,7 +54,7 @@ async def process(
         return {"okay": False, "message": "Could not locate repository on GitBox - please contact ASF Infra."}
     with open(os.path.join(repo_path, "nocommit"), "w") as f:
         now = time.ctime()
-        f.write(f"Archived at {now}\n")
+        f.write(f"Archived at {now} by {session.credentials.uid} ({session.credentials.name})\n")
         f.close()
 
 
