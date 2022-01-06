@@ -62,7 +62,7 @@ class GitHubOrganisation:
             async with aiohttp.ClientSession(headers=self.api_headers) as session:
                 async with session.delete(url) as rv:
                     txt = await rv.text()
-                    assert rv.status == 204, f"Unexpected retun code for DELETE on {url}: {rv.status}"
+                    assert rv.status == 204, f"Unexpected return code for DELETE on {url}: {rv.status}"
                     return txt
 
     async def api_put(self, url: str, jsdata: typing.Optional[dict] = None):
@@ -72,8 +72,19 @@ class GitHubOrganisation:
             async with aiohttp.ClientSession(headers=self.api_headers) as session:
                 async with session.put(url, json=jsdata) as rv:
                     txt = await rv.text()
-                    assert rv.status in [200, 204], f"Unexpected retun code for PUT on {url}: {rv.status}"
+                    assert rv.status in [200, 204], f"Unexpected return code for PUT on {url}: {rv.status}"
                     return txt
+
+    async def api_patch(self, url: str, jsdata: typing.Optional[dict] = None):
+        if DEBUG:
+            print("[DEBUG] PATCH", url)
+        else:
+            async with aiohttp.ClientSession(headers=self.api_headers) as session:
+                async with session.patch(url, json=jsdata) as rv:
+                    txt = await rv.text()
+                    assert rv.status in [200, 204], f"Unexpected return code for PATCH on {url}: {rv.status}"
+                    return txt
+
 
     async def api_post(self, url: str, jsdata: typing.Optional[dict] = None):
         if DEBUG:
