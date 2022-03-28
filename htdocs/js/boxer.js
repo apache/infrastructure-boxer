@@ -201,10 +201,12 @@ function show_page_profile(canvas, login) {
                 repospan.style.width = "450px";
                 repospan.innerText = repo + ".git";
                 const gha = document.createElement('a');
+                gha.style.marginLeft = "20px";
                 gha.setAttribute("href", ghlink);
                 gha.setAttribute("target", "_blank");
                 gha.innerText = "GitHub";
                 const gba = document.createElement('a');
+                gba.style.marginLeft = "20px";
                 gba.setAttribute("href", gblink);
                 gba.setAttribute("target", "_blank");
                 gba.innerText = "GitBox";
