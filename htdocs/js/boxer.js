@@ -211,6 +211,7 @@ function show_page_profile(canvas, login) {
                 gba.setAttribute("target", "_blank");
                 gba.innerText = "GitBox";
                 const visispan = document.createElement('span');
+                visispan.style.marginLeft = "20px";
                 visispan.style.display = "inline-block";
                 visispan.innerText = private ? "Private" : "Public";
                 visispan.style.color = private ? "red" : "black";
