@@ -6,7 +6,7 @@ import plugins.projects
 import dateutil.parser
 
 GRAPHQL_URL = "https://api.github.com/graphql"
-DEBUG = False  # We don't wanna do the PUT/DELETE right now, so let's not...
+DEBUG = True  # We don't wanna do the PUT/DELETE right now, so let's not...
 
 
 class GitHubOrganisation:
