@@ -185,7 +185,6 @@ function show_page_profile(canvas, login) {
             login.github.repositories.sort();
             for (let i = 0; i < login.github.repositories.length; i++) {
                 let repo = login.github.repositories[i];
-                let a = document.createElement('a');
                 const ghlink = `https://github.com/${gh_org}/${repo}`;
                 let gblink = `https://gitbox.apache.org/repos/asf/${repo}.git`;
                 let private = false;
@@ -197,10 +196,22 @@ function show_page_profile(canvas, login) {
                         gblink = `https://gitbox.apache.org/repos/${project}/${repo}.git`;
                     }
                 }
-                a.setAttribute("href", ghlink);
-                a.innerText = repo;
-                let li = document.createElement('li');
-                li.appendChild(a);
+                const repospan = document.createElement('span');
+                repospan.style.display = "inline-block";
+                repospan.style.width = "450px";
+                repospan.innerText = repo + ".git";
+                const gha = document.createElement('a');
+                gha.setAttribute("href", ghlink);
+                gha.setAttribute("target", "_blank");
+                gha.innerText = "GitHub";
+                const gba = document.createElement('a');
+                gba.setAttribute("href", gblink);
+                gba.setAttribute("target", "_blank");
+                gba.innerText = "GitBox";
+                const li = document.createElement('li');
+                li.appendChild(repospan);
+                li.appendChild(gha);
+                li.appendChild(gba);
                 ul.appendChild(li);
             }
         } else {
