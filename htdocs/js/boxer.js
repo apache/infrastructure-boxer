@@ -210,10 +210,15 @@ function show_page_profile(canvas, login) {
                 gba.setAttribute("href", gblink);
                 gba.setAttribute("target", "_blank");
                 gba.innerText = "GitBox";
+                const visispan = document.createElement('span');
+                visispan.style.display = "inline-block";
+                visispan.innerText = private ? "Private" : "Public";
+                visispan.style.color = private ? "red" : "black";
                 const li = document.createElement('li');
                 li.appendChild(repospan);
                 li.appendChild(gha);
                 li.appendChild(gba);
+                li.appendChild(visispan);
                 ul.appendChild(li);
             }
         } else {
