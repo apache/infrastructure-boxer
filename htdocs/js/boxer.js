@@ -198,7 +198,7 @@ function show_page_profile(canvas, login) {
                 }
                 const repospan = document.createElement('span');
                 repospan.style.display = "inline-block";
-                repospan.style.width = "450px";
+                repospan.style.width = "480px";
                 repospan.innerText = repo + ".git";
                 const gha = document.createElement('a');
                 gha.style.marginLeft = "20px";
