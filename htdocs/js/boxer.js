@@ -197,8 +197,8 @@ function show_page_profile(canvas, login) {
                         gblink = `https://gitbox.apache.org/repos/${project}/${repo}.git`;
                     }
                 }
-                a.setAttribute("href", link);
-                a.innerText = link;
+                a.setAttribute("href", ghlink);
+                a.innerText = repo;
                 let li = document.createElement('li');
                 li.appendChild(a);
                 ul.appendChild(li);
