@@ -1,4 +1,4 @@
-let gh_org = "asftest";
+let gh_org = "apache";
 let gh_client_id = '8c54a8ee6f5be892bb41';
 let state = Math.random().toString(20).substr(2, 6) + Math.random().toString(20).substr(2, 6) + Math.random().toString(20).substr(2, 6);
 let hostname = location.hostname;
@@ -594,7 +594,7 @@ async function create_new_repo(project, name, priv, title, commit, dev) {
     if (rv.okay == true) {
         let canvas = document.getElementById('main');
         let repo_url_gitbox = "https://gitbox-test.apache.org/repos/" + ( priv ? "private/" + project : "asf") + "/" + name;
-        let repo_url_github= "https://github.com/asftest/" + name;
+        let repo_url_github= "https://github.com/apache/" + name;
         canvas.innerText = 'Your repository has been created and will be available for use within a few minutes.';
         canvas.appendChild(br());
         canvas.appendChild(document.createTextNode("Your project is available on gitbox at: "));
