@@ -168,7 +168,11 @@ async def run_tasks(server: plugins.basetypes.Server):
             server.data.teams = await asf_github_org.load_teams()
 
         async with ProgTimer("Looking for missing/invalid GitHub teams"):
-            await asf_github_org.setup_teams(server.data.projects)
+            try:
+                await asf_github_org.setup_teams(server.data.projects)
+            except AssertionError as e:
+                print("Got an AssertionError while tryin to set up GitHub teams, will try again later:")
+                print(e)
 
         async with ProgTimer("Fetching latest LDAP data via Whimsy"):
             try:
