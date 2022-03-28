@@ -189,7 +189,7 @@ function show_page_profile(canvas, login) {
                 const ghlink = `https://github.com/${gh_org}/${repo}`;
                 let gblink = `https://gitbox.apache.org/repos/asf/${repo}.git`;
                 let private = false;
-                if (login.github.private.contains(repo)) {
+                if (login.github.private.includes(repo)) {
                     private = true;
                     let m = repo.match(/^(?:incubator-)?(empire-db|[^-.]+)-?.*/);
                     if (m) {
