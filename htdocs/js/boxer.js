@@ -272,7 +272,7 @@ async function search_fetch(obj) {
     previous_query = search_query;
     obj.innerHTML = "";
     let res = await GET('api/users.json?query=' + search_query);
-    history.pushState({}, "Search Results", 'boxer.html?action=search&query=' + search_query);
+    history.pushState({}, "Search Results", '?action=search&query=' + search_query);
     if (res.results) {
         if (res.results.length == 0) {
             obj.innerText = `No results matching ${search_query} could be found.`;
@@ -388,11 +388,11 @@ function search_page(canvas, query) {
     ul.append(li);
 
     li = document.createElement('li');
-    li.innerText = "[1] Not authed on GitHub: The user exists in LDAP, but has not used the Boxer app to authenticate with GitHub yet (so we don't know their GitHub login). To fix, the user should use boxer.html to authenticate with GitHub and follow the remaining steps.";
+    li.innerText = "[1] Not authed on GitHub: The user exists in LDAP, but has not used the Boxer app to authenticate with GitHub yet (so we don't know their GitHub login). To fix, the user should use boxer to authenticate with GitHub and follow the remaining steps.";
     ul.append(li);
 
     li = document.createElement('li');
-    li.innerText = `[2] Not part of GiHub org: The user has completed the ASF and GitHub OAuth steps, but have not been invited to the ASF GitHub organization yet, or have not accepted the invitation. User should check https://github.com/orgs/${gh_org}/invitation for a pending invite, or follow the boxer.html guide to sending an invitation.`;
+    li.innerText = `[2] Not part of GiHub org: The user has completed the ASF and GitHub OAuth steps, but have not been invited to the ASF GitHub organization yet, or have not accepted the invitation. User should check https://github.com/orgs/${gh_org}/invitation for a pending invite, or follow the boxer guide to sending an invitation.`;
     ul.append(li);
 
     li = document.createElement('li');
@@ -638,7 +638,7 @@ async function prime() {
     if (formdata.action == "oauth") {
         oauth = await POST("api/oauth.json", formdata);
         if (oauth.okay) {
-            location.href = "boxer.html";
+            location.href = "/boxer/";
             return
         } else {
             alert("Something went wrong... :(");
@@ -647,7 +647,7 @@ async function prime() {
 
     // Otherwise, if not logged in yet, go to OAuth
     else if (!login.credentials.uid) {
-        let oauth_url = encodeURIComponent(`https://${hostname}/boxer.html?action=oauth&state=` + state);
+        let oauth_url = encodeURIComponent(`https://${hostname}/boxer/?action=oauth&state=` + state);
         location.href = "https://oauth.apache.org/auth?redirect_uri=" + oauth_url + "&state=" + state;
         return
     }
@@ -684,7 +684,7 @@ async function prime() {
 
 
 function begin_oauth_github() {
-    let oauth_url = encodeURIComponent(`https://${hostname}/boxer.html?action=oauth&key=github&state=` + state);
+    let oauth_url = encodeURIComponent(`https://${hostname}/boxer/?action=oauth&key=github&state=` + state);
     let ghurl = `https://github.com/login/oauth/authorize?client_id=${gh_client_id}&redirect_uri=${oauth_url}`;
     console.log(ghurl);
     location.href = ghurl;
