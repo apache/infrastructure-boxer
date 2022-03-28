@@ -51,11 +51,11 @@ async function GET(url = '') {
 }
 
 function logout() {
-    GET("/api/preferences?logout=true").then(() => location.href = '/');
+    GET("api/preferences?logout=true").then(() => location.href = '/');
 }
 
 function check_github_invite(canvas) {
-    GET("/api/preferences.json").then((js) => {
+    GET("api/preferences.json").then((js) => {
         if (js.credentials.github_org_member) {
             canvas.innerText = "GitHub organization invite recorded! Hang tight, we're loading things for you...";
             window.setTimeout(() => { location.search = ''; location.reload();}, 4000);
@@ -67,7 +67,7 @@ function check_github_invite(canvas) {
 
 
 function invite_github(canvas) {
-    GET("/api/invite").then(
+    GET("api/invite").then(
         (js) => {
             if (js.okay) {
                 canvas.innerHTML = "";
@@ -582,7 +582,7 @@ function prep_new_repo(refresh=false, submit=false) {
 
 async function create_new_repo(project, name, priv, title, commit, dev) {
     blurbg(true);
-    let rv = await POST("/api/repository.json" , {
+    let rv = await POST("api/repository.json" , {
             action: 'create' ,
             repository: name,
             private: priv,
@@ -631,12 +631,12 @@ async function prime() {
         );
     }
     // Fetch prefs, see if we're authed
-    let login = await GET("/api/preferences.json");
+    let login = await GET("api/preferences.json");
     login_cached = login;
 
     // If OAuth call, bypass the prefs check
     if (formdata.action == "oauth") {
-        oauth = await POST("/api/oauth.json", formdata);
+        oauth = await POST("api/oauth.json", formdata);
         if (oauth.okay) {
             location.href = "boxer.html";
             return
