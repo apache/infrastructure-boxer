@@ -1,5 +1,5 @@
 let gh_org = "apache";
-let gh_client_id = '8c54a8ee6f5be892bb41';
+let gh_client_id = '6f70292dcb4d00b5f537';
 let state = Math.random().toString(20).substr(2, 6) + Math.random().toString(20).substr(2, 6) + Math.random().toString(20).substr(2, 6);
 let hostname = location.hostname;
 
