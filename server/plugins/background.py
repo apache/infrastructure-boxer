@@ -185,9 +185,12 @@ async def run_tasks(server: plugins.basetypes.Server):
                     server.data.podlings = podlings
             except aiohttp.ClientError:
                 pass
-
-        await adjust_teams(server)
-        await adjust_repositories(server)
+        try:
+            await adjust_teams(server)
+            await adjust_repositories(server)
+        except AssertionError as e:
+            print("AssertionError happened during GitHub adjustments, bailing for now")
+            print(e)
 
         alimit, aused, aresets = await asf_github_org.rate_limit_graphql()
         used_gql = aused
