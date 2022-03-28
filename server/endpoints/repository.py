@@ -131,7 +131,7 @@ our $javascript = "/static/gitweb.js";
                     f.close()
 
                 proc = await asyncio.create_subprocess_exec(
-                        '/usr/sbin/service', 'apache2', 'graceful',
+                        '/usr/bin/sudo', '/usr/sbin/service', 'apache2', 'graceful',
                     stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
                     )
                 stdout, stderr = await proc.communicate()
