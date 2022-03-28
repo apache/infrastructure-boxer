@@ -186,7 +186,17 @@ function show_page_profile(canvas, login) {
             for (let i = 0; i < login.github.repositories.length; i++) {
                 let repo = login.github.repositories[i];
                 let a = document.createElement('a');
-                let link = `https://github.com/${gh_org}/${repo}`;
+                const ghlink = `https://github.com/${gh_org}/${repo}`;
+                let gblink = `https://gitbox.apache.org/repos/asf/${repo}.git`;
+                let private = false;
+                if (login.github.private.contains(repo)) {
+                    private = true;
+                    let m = repo.match(/^(?:incubator-)?(empire-db|[^-.]+)-?.*/);
+                    if (m) {
+                        const project = m[1];
+                        gblink = `https://gitbox.apache.org/repos/${project}/${repo}.git`;
+                    }
+                }
                 a.setAttribute("href", link);
                 a.innerText = link;
                 let li = document.createElement('li');
