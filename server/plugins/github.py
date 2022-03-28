@@ -74,7 +74,7 @@ class GitHubOrganisation:
                 async with session.put(url, json=jsdata) as rv:
                     txt = await rv.text()
                     assert rv.status in [200, 204], f"Unexpected return code for PUT on {url}: {rv.status}"
-                    await asyncio.sleep(0.5)
+                    await asyncio.sleep(1.05)
                     return txt
 
     async def api_patch(self, url: str, jsdata: typing.Optional[dict] = None):
@@ -85,6 +85,7 @@ class GitHubOrganisation:
                 async with session.patch(url, json=jsdata) as rv:
                     txt = await rv.text()
                     assert rv.status in [200, 204], f"Unexpected return code for PATCH on {url}: {rv.status}"
+                    await asyncio.sleep(1.05)
                     return txt
 
 
@@ -96,6 +97,7 @@ class GitHubOrganisation:
                 async with session.post(url, json=jsdata) as rv:
                     txt = await rv.text()
                     assert rv.status == 201, f"Unexpected retun code for POST on {url}: {rv.status}"
+                    await asyncio.sleep(1.05)
                     return txt
 
     def get_team(self, team: str, private: bool) -> typing.Optional["GitHubTeam"]:
