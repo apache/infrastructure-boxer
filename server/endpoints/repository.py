@@ -152,7 +152,7 @@ our $javascript = "/static/gitweb.js";
                 f.close()
         rv = await create_repo(server, reponame, title, pmc, private)
         if rv is True:
-            params = ['-c', commit_mail, '-d', title, "git@github.com:%s/%s" % (server.config.github.org, reponame),
+            params = ['-c', commit_mail, '-d', title, "git@github:%s/%s" % (server.config.github.org, reponame),
                       repo_path]
             proc = await asyncio.create_subprocess_exec(
                 GB_CLONE_EXEC, *params, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
