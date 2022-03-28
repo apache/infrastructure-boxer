@@ -89,7 +89,7 @@ async def process(
                     return {"okay": False, "message": "Only (I)PMC members of this project may create repositories"}
 
         repourl_gh = f"https://github.com/{server.config.github.org}/{reponame}"
-        repourl_gb = f"https://gitbox-test.apache.org/repos/asf/{reponame}"
+        repourl_gb = f"https://gitbox.apache.org/repos/asf/{reponame}"
         if not private:
             repo_path = os.path.join(server.config.repos.public, reponame)
             if os.path.exists(repo_path):
@@ -97,7 +97,7 @@ async def process(
         else:
             if not session.credentials.admin:
                 return {"okay": False, "message": "Private repositories can only be created by Infrastructure staff"}
-            repourl_gb = f"https://gitbox-test.apache.org/repos/private/{pmc}/{reponame}"
+            repourl_gb = f"https://gitbox.apache.org/repos/private/{pmc}/{reponame}"
             repo_path = os.path.join(server.config.repos.private, pmc, reponame)
             pmc_dir = os.path.join(server.config.repos.private, pmc)
             # If PMC dir does not exist, create it and plop in a .htaccess file for auth
