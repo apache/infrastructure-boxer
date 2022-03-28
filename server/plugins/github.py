@@ -380,7 +380,7 @@ class GitHubTeam:
         self.org = org
         self.id = nodedata["node"]["databaseId"]
         self.slug = nodedata["node"]["slug"]
-        self.name = nodedata["node"]["name"]
+        self.name = nodedata["node"]["name"].lower()
         if " " in self.name:
             self.project, self.type = self.name.lower().split(
                 " ", 1
