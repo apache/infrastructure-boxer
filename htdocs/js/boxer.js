@@ -200,6 +200,7 @@ function show_page_profile(canvas, login) {
                 repospan.style.display = "inline-block";
                 repospan.style.width = "480px";
                 repospan.innerText = repo + ".git";
+                repospan.style.color = private ? "red" : "black";
                 const gha = document.createElement('a');
                 gha.style.marginLeft = "20px";
                 gha.setAttribute("href", ghlink);
