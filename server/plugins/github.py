@@ -4,6 +4,7 @@ import typing
 import json
 import plugins.projects
 import dateutil.parser
+import asyncio
 
 GRAPHQL_URL = "https://api.github.com/graphql"
 DEBUG = True  # We don't wanna do the PUT/DELETE right now, so let's not...
@@ -73,6 +74,7 @@ class GitHubOrganisation:
                 async with session.put(url, json=jsdata) as rv:
                     txt = await rv.text()
                     assert rv.status in [200, 204], f"Unexpected return code for PUT on {url}: {rv.status}"
+                    await asyncio.sleep(0.5)
                     return txt
 
     async def api_patch(self, url: str, jsdata: typing.Optional[dict] = None):
