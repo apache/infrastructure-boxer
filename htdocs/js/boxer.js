@@ -193,7 +193,7 @@ function show_page_profile(canvas, login) {
                     let m = repo.match(/^(?:incubator-)?(empire-db|[^-.]+)-?.*/);
                     if (m) {
                         const project = m[1];
-                        gblink = `https://gitbox.apache.org/repos/${project}/${repo}.git`;
+                        gblink = `https://gitbox.apache.org/repos/private/${project}/${repo}.git`;
                     }
                 }
                 const repospan = document.createElement('span');
