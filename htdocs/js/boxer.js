@@ -214,7 +214,7 @@ function show_page_profile(canvas, login) {
                 const visispan = document.createElement('span');
                 visispan.style.marginLeft = "20px";
                 visispan.style.display = "inline-block";
-                visispan.innerText = private ? "Private" : "Public";
+                visispan.innerText = private ? "Private repository" : "Public repository";
                 visispan.style.color = private ? "red" : "black";
                 const li = document.createElement('li');
                 li.appendChild(repospan);
