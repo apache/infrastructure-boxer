@@ -562,6 +562,7 @@ function new_repo_prompt(canvas, login) {
     canvas.appendChild(br());
     let a = document.createElement('a');
     a.setAttribute("href" , "https://s.apache.org/asfyaml");
+    a.setAttribute("target" , "_blank");
     a.innerText = ".asf.yaml";
     canvas.appendChild(document.createTextNode("You may fine tune these settings later using "));
     canvas.appendChild(a);
