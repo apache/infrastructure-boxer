@@ -64,6 +64,7 @@ class GitHubOrganisation:
                 async with session.delete(url) as rv:
                     txt = await rv.text()
                     assert rv.status == 204, f"Unexpected return code for DELETE on {url}: {rv.status}"
+                    await asyncio.sleep(1.05)
                     return txt
 
     async def api_put(self, url: str, jsdata: typing.Optional[dict] = None):
