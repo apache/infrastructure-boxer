@@ -60,7 +60,7 @@ $feature{'avatar'}{'default'} = ['gravatar'];
 $feature{'highlight'}{'default'} = [1];
 
 """
-
+EXEC_ADDITIONAL_PROJECTS = ["board", "members", "foundation"]
 
 async def process(
         server: plugins.basetypes.Server, session: plugins.session.SessionObject, indata: dict
@@ -80,7 +80,7 @@ async def process(
         title = indata.get("title", "Apache %s" % pmc)
 
         # Check LDAP ownership
-        if not session.credentials.admin:
+        if not session.credentials.admin and not (session.credentials.member and pmc in EXEC_ADDITIONAL_PROJECTS):
             async with plugins.ldap.LDAPClient(server.config.ldap) as lc:
                 committer_list, pmc_list = await lc.get_members(pmc)
                 if not pmc_list:
