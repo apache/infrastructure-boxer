@@ -109,6 +109,9 @@ header nav ul li a {
   text-decoration: none;
   pointer-events: auto;
 }
+header nav ul > li > ul > li {
+  padding: 6px;
+}
 header nav ul.hidden:after {
   min-width: 120px;
   content: "▲";
