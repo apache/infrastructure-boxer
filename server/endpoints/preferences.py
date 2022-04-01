@@ -52,7 +52,7 @@ async def process(
             all_projects = list(sorted(all_projects))
         elif session.credentials.member:
             all_projects.extend(EXEC_ADDITIONAL_PROJECTS)
-            pmcs.extend(EXEC_ADDDITIONAL_PROJECTS)
+            pmcs.extend(EXEC_ADDITIONAL_PROJECTS)
             pmcs = list(sorted(pmcs))
             all_projects = list(sorted(all_projects))
 
