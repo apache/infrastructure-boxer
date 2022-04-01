@@ -19,6 +19,7 @@ import plugins.basetypes
 import plugins.session
 
 ADMIN_ADDITIONAL_PROJECTS = ["infrastructure", "members", "board", "foundation"]
+EXEC_ADDITIONAL_PROJECTS = ["members", "board", "foundation"]
 
 """ Generic preferences endpoint for Boxer"""
 
@@ -48,6 +49,9 @@ async def process(
                 pmcs.append(project)
         if session.credentials.admin:
             all_projects.extend(ADMIN_ADDITIONAL_PROJECTS)
+            all_projects = list(sorted(all_projects))
+        elif session.credentials.member:
+            all_projects.extend(EXEC_ADDITIONAL_PROJECTS)
             all_projects = list(sorted(all_projects))
 
     prefs: dict = {"credentials": {}, "github": github_data, "pmcs": pmcs, "all_projects": all_projects, "podlings": server.data.podlings}
