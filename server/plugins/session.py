@@ -40,6 +40,7 @@ class SessionCredentials:
         self.admin: bool = kwargs.get("admin", False)
         self.github_login = kwargs.get("github_login", None)
         self.github_id = 0
+        self.member: bool = kwargs.get("member", False)
 
 
 class SessionObject:
