@@ -52,6 +52,8 @@ async def process(
             all_projects = list(sorted(all_projects))
         elif session.credentials.member:
             all_projects.extend(EXEC_ADDITIONAL_PROJECTS)
+            pmcs.extend(EXEC_ADDDITIONAL_PROJECTS)
+            pmcs = list(sorted(pmcs))
             all_projects = list(sorted(all_projects))
 
     prefs: dict = {"credentials": {}, "github": github_data, "pmcs": pmcs, "all_projects": all_projects, "podlings": server.data.podlings}
