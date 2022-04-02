@@ -165,6 +165,7 @@ our $javascript = "/static/gitweb.js";
                     f.write("\n[apache]\n    dev = %s\n" % issue_mail)
                     f.close()
                 asfpy.messaging.mail(
+                    sender="GitBox <gitbox@apache.org>",
                     recipients=[NEW_REPO_NOTIFY, f"private@{pmc}.apache.org"],
                     subject=f"New GitBox/GitHub repository set up: {reponame}",
                     message=NEW_REPO_NOTIFY_MSG % locals()
