@@ -41,6 +41,7 @@ async def process(
                     "mfa": p.github_mfa,
                     "login": p.github_login,
                 }
+                break
     pmcs = []
     all_projects = list(server.data.pmcs.keys())
     if session.credentials:
