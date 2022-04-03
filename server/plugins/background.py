@@ -171,36 +171,38 @@ async def run_tasks(server: plugins.basetypes.Server):
             except (AssertionError, TypeError) as e:
                 print("Invalid response from GitHub while trying to fetch latest teams, will use cached response:")
                 print(e)
+        if server.data.teams: 
+            async with ProgTimer("Looking for missing/invalid GitHub teams"):
+                try:
+                    await asf_github_org.setup_teams(server.data.projects)
+                except AssertionError as e:
+                    print("Got an AssertionError while trying to set up GitHub teams, will try again later:")
+                    print(e)
 
-        async with ProgTimer("Looking for missing/invalid GitHub teams"):
+            async with ProgTimer("Fetching latest LDAP data via Whimsy"):
+                try:
+                    session_timeout = aiohttp.ClientTimeout(total=None, sock_connect=15, sock_read=15)
+                    url = "https://whimsy.apache.org/public/public_ldap_projects.json"
+                    async with aiohttp.client.ClientSession(timeout=session_timeout) as hc:
+                        rv = await hc.get(url)
+                        js = await rv.json()
+                        podlings = []
+                        for project, data in js['projects'].items():
+                            server.data.pmcs[project] = data.get("owners", [])
+                            if data.get("podling") == "current":
+                                podlings.append(project)
+                        server.data.podlings = podlings
+                except aiohttp.ClientError:
+                    pass
             try:
-                await asf_github_org.setup_teams(server.data.projects)
+                await adjust_teams(server)
+                await adjust_repositories(server)
             except AssertionError as e:
-                print("Got an AssertionError while trying to set up GitHub teams, will try again later:")
+                print("AssertionError happened during GitHub adjustments, bailing for now")
                 print(e)
-
-        async with ProgTimer("Fetching latest LDAP data via Whimsy"):
-            try:
-                session_timeout = aiohttp.ClientTimeout(total=None, sock_connect=15, sock_read=15)
-                url = "https://whimsy.apache.org/public/public_ldap_projects.json"
-                async with aiohttp.client.ClientSession(timeout=session_timeout) as hc:
-                    rv = await hc.get(url)
-                    js = await rv.json()
-                    podlings = []
-                    for project, data in js['projects'].items():
-                        server.data.pmcs[project] = data.get("owners", [])
-                        if data.get("podling") == "current":
-                            podlings.append(project)
-                    server.data.podlings = podlings
-            except aiohttp.ClientError:
-                pass
-        try:
-            await adjust_teams(server)
-            await adjust_repositories(server)
-        except AssertionError as e:
-            print("AssertionError happened during GitHub adjustments, bailing for now")
-            print(e)
-
+        else:
+            print("I could not find any GitHub Teams, not doing setup this round")
+            
         alimit, aused, aresets = await asf_github_org.rate_limit_graphql()
         used_gql = aused
         if used < aused:
