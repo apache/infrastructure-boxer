@@ -7,7 +7,7 @@ import dateutil.parser
 import asyncio
 
 GRAPHQL_URL = "https://api.github.com/graphql"
-DEBUG = True  # We don't wanna do the PUT/DELETE right now, so let's not...
+DEBUG = False  # Set to True to disable GitHub API calls
 
 
 class GitHubOrganisation:
