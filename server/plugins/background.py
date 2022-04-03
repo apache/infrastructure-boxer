@@ -165,13 +165,18 @@ async def run_tasks(server: plugins.basetypes.Server):
                     person.github_mfa = False  # Flag as no MFA if person was not found
 
         async with ProgTimer("Getting GitHub teams and their members"):
-            server.data.teams = await asf_github_org.load_teams()
+            try:
+                tmp_teams = await asf_github_org.load_teams()
+                server.data.teams = tmp_teams
+            except (AssertionError, TypeError) as e:
+                print("Invalid response from GitHub while trying to fetch latest teams, will use cached response:")
+                print(e)
 
         async with ProgTimer("Looking for missing/invalid GitHub teams"):
             try:
                 await asf_github_org.setup_teams(server.data.projects)
             except AssertionError as e:
-                print("Got an AssertionError while tryin to set up GitHub teams, will try again later:")
+                print("Got an AssertionError while trying to set up GitHub teams, will try again later:")
                 print(e)
 
         async with ProgTimer("Fetching latest LDAP data via Whimsy"):
