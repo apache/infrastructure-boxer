@@ -624,7 +624,7 @@ async function create_new_repo(project, name, priv, title, commit, dev) {
     blurbg(false);
     if (rv.okay == true) {
         let canvas = document.getElementById('main');
-        let repo_url_gitbox = "https://gitbox-test.apache.org/repos/" + ( priv ? "private/" + project : "asf") + "/" + name;
+        let repo_url_gitbox = "https://gitbox.apache.org/repos/" + ( priv ? "private/" + project : "asf") + "/" + name;
         let repo_url_github= "https://github.com/apache/" + name;
         canvas.innerText = 'Your repository has been created and will be available for use within a few minutes.';
         canvas.appendChild(br());
