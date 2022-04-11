@@ -10,7 +10,7 @@ import plugins.repositories
 import plugins.projects
 import plugins.github
 import aiohttp
-
+import yaml
 
 class ProgTimer:
     """A simple task timer that displays when a sub-task is begun, ends, and the time taken."""
@@ -202,7 +202,20 @@ async def run_tasks(server: plugins.basetypes.Server):
                 print(e)
         else:
             print("I could not find any GitHub Teams, not doing setup this round")
-            
+        
+        async with ProgTimer("Writing github->ldap map file ghmap.yaml"):
+            try:
+                ghmap = {}
+                for person in server.data.people:
+                    if person.github_login and person.github_login in server.data.mfa:
+                        ghmap[person.github_login] = person.asf_id
+                with open("./ghmap.yaml", "w") as f:
+                    yaml.dump(ghmap, f)
+                    f.close()
+            except Exception as e:
+                print("Could not write GH map file!")
+                print(e)
+        
         alimit, aused, aresets = await asf_github_org.rate_limit_graphql()
         used_gql = aused
         if used < aused:
