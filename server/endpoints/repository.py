@@ -73,7 +73,7 @@ async def process(
         reponame = indata.get("repository")
         uid = session.credentials.uid
         private = indata.get("private", False)
-        m = re.match(r"^([a-z0-9]+)(-[-0-9a-z]+)?\.git$", reponame)  # httpd.git or sling-foo.git etc
+        m = re.match(r"^(?:incubator-)?([a-z0-9]+)(-[-0-9a-z]+)?\.git$", reponame)  # httpd.git or sling-foo.git etc
         if not m:
             return {"okay": False, "message": "Invalid repository name specified"}
         pmc = m.group(1)
