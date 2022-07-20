@@ -27,7 +27,7 @@ import asfpy.messaging
 
 GIT_EXEC = shutil.which("git")
 GB_CLONE_EXEC = "/x1/gitbox/bin/gitbox-clone"
-NEW_REPO_NOTIFY = 'private@infra.apache.org'
+NEW_REPO_NOTIFY = 'notifications@infra.apache.org'
 NEW_REPO_NOTIFY_MSG = """
 A new repository has been set up by %(uid)s@apache.org: %(reponame)s
 
