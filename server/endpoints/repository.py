@@ -108,7 +108,7 @@ async def process(
 AuthType Basic
 AuthName "ASF Private Repos for Apache {pmc}"
 AuthBasicProvider ldap
-AuthLDAPUrl "ldaps://ldap-eu-ro.apache.org/ou=people,dc=apache,dc=org?uid"
+AuthLDAPUrl "ldaps://ldap-eu.apache.org/ou=people,dc=apache,dc=org?uid"
 AuthLDAPGroupAttribute owner
 AuthLDAPGroupAttributeIsDN on
 Require ldap-group cn={pmc},ou=project,ou=groups,dc=apache,dc=org
