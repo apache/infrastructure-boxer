@@ -197,14 +197,14 @@ async def run_tasks(server: plugins.basetypes.Server):
                     pass
             if plugins.ldap.PROJECTS_OVERRIDE and os.path.exists(plugins.ldap.PROJECTS_OVERRIDE):
                 async with ProgTimer("Reading projects override configuration"):
-                try:
-                    ldap_override = yaml.safe_load(open(plugins.ldap.PROJECTS_OVERRIDE))
-                    for project, data in ldap_overrride.items():
-                        if project not in server.data.pmcs:
-                            print(f"Adding override for virtual project {project}")
-                            server.data.pmcs[project] = []  # Empty for now, populate later..?
-                except yaml.YAMLError as err:
-                    print(f"Could not load ldap override yaml, {plugins.ldap.PROJECTS_OVERRIDE}: {err}")
+                    try:
+                        ldap_override = yaml.safe_load(open(plugins.ldap.PROJECTS_OVERRIDE))
+                        for project, data in ldap_overrride.items():
+                            if project not in server.data.pmcs:
+                                print(f"Adding override for virtual project {project}")
+                                server.data.pmcs[project] = []  # Empty for now, populate later..?
+                    except yaml.YAMLError as err:
+                        print(f"Could not load ldap override yaml, {plugins.ldap.PROJECTS_OVERRIDE}: {err}")
 
             try:
                 await adjust_teams(server)
