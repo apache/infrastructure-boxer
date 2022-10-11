@@ -18,6 +18,7 @@ import yaml
 import os
 
 UID_RE = re.compile(r"^(?:uid=)?([^,]+)")
+PROJECTS_OVERRIDE = "projects.yaml"
 
 
 class LDAPConfig:
@@ -43,7 +44,7 @@ class LDAPClient:
     connection: typing.Optional[bonsai.LDAPConnection]
     ldap_override: dict
 
-    def __init__(self, config: LDAPConfig, ldap_override_yaml="projects.yaml"):
+    def __init__(self, config: LDAPConfig, ldap_override_yaml=PROJECTS_OVERRIDE):
         self.config = config
         self.client = None
         self.connection = None
