@@ -137,6 +137,7 @@ async def run_tasks(server: plugins.basetypes.Server):
 
         async with ProgTimer("Gathering list of repositories on GitHub"):
             server.data.github_repos = await asf_github_org.load_repositories()
+            print(f"Found {len(server.data.github_repos)} repositories on GitHub")
         async with ProgTimer("Compiling list of projects, repos and memberships"):
             try:
                 asf_org = await plugins.projects.compile_data(
