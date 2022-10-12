@@ -204,13 +204,10 @@ class GitHubOrganisation:
                             await team.get_repositories()
                             print("Filled with %u repos!" % len(team.repos))
                         teams.append(team)
-                    next_page = js["data"]["organization"]["teams"]["pageInfo"][
-                        "hasNextPage"
-                    ]
-                    after = (
-                        '"%s"'
-                        % js["data"]["organization"]["teams"]["pageInfo"]["endCursor"]
-                    )
+                    endcursor = js["data"]["organization"]["teams"]["pageInfo"]["endCursor"]
+                    next_page = endcursor not in [None, "null"]  # GraphQL is broken, look for null value here, do not trust hasNextPage
+                    if next_page:
+                        after = '"%s"' % endcursor
         self.teams = teams
         return teams
 
@@ -246,13 +243,10 @@ class GitHubOrganisation:
                     for edge in js["data"]["organization"]["repositories"]["edges"]:
                         repo = edge['node']['name']
                         repos.append(repo)
-                    next_page = js["data"]["organization"]["repositories"]["pageInfo"][
-                        "hasNextPage"
-                    ]
-                    after = (
-                        '"%s"'
-                        % js["data"]["organization"]["repositories"]["pageInfo"]["endCursor"]
-                    )
+                    endcursor = js["data"]["organization"]["repositories"]["pageInfo"]["endCursor"]
+                    next_page = endcursor not in [None, "null"]  # GraphQL is broken, look for null value here, do not trust hasNextPage
+                    if next_page:
+                        after = '"%s"' % endcursor
         self.repositories = repos
         return repos
 
