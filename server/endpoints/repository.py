@@ -26,6 +26,7 @@ import shutil
 import asfpy.messaging
 
 GIT_EXEC = shutil.which("git")
+MAIL_LISTS_URL = "https://webmod.apache.org/lists"
 GB_CLONE_EXEC = "/x1/gitbox/bin/gitbox-clone"
 NEW_REPO_NOTIFY = 'notifications@infra.apache.org'
 NEW_REPO_NOTIFY_MSG = """
@@ -146,6 +147,17 @@ our $javascript = "/static/gitweb.js";
         # Get last bits of info
         commit_mail = indata.get("commit", "commits@%s.apache.org" % pmc)
         issue_mail = indata.get("issue", "dev@%s.apache.org" % pmc)
+        
+        # Verify mailing lists against mailgw, re INFRA-23797
+        session_timeout = aiohttp.ClientTimeout(total=None, sock_connect=15, sock_read=15)
+        async with aiohttp.client.ClientSession(timeout=session_timeout) as hc:
+            rv = await hc.get(MAIL_LISTS_URL)
+            mailinglists = await rv.json()
+            if commit_mail not in mailinglists:
+                return {"okay": False, "message": "The commit mailing list target is not a valid apache.org mailing list, please fix!"}
+            if issue_mail not in mailinglists:
+                return {"okay": False, "message": "The issues mailing list target is not a valid apache.org mailing list, please fix!"}
+
 
         # Create the repo
         if private and GB_GITWEB_PATH:
