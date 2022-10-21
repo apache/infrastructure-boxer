@@ -216,7 +216,7 @@ class GitHubOrganisation:
         query = """
         {
             organization(login: "%s") {
-                repositories(first: 100, after:%s) {
+                repositories(first: 100, after:%s, orderBy: {field: CREATED_AT, direction: ASC}) {
                     pageInfo {
                         hasNextPage
                         endCursor
