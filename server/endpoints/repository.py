@@ -112,6 +112,8 @@ AuthType Basic
 AuthName "ASF Private Repos for Apache {pmc}"
 AuthBasicProvider ldap
 AuthLDAPUrl "ldaps://ldap-eu.apache.org/ou=people,dc=apache,dc=org?uid"
+AuthLDAPBindDN cn=nss_p6,ou=users,ou=services,dc=apache,dc=org
+AuthLDAPBindPassword "exec:/usr/bin/asfldapsearch --pwd"
 AuthLDAPGroupAttribute owner
 AuthLDAPGroupAttributeIsDN on
 Require ldap-group cn={pmc},ou=project,ou=groups,dc=apache,dc=org
