@@ -55,7 +55,7 @@ async def process(
             pmcs.extend(EXEC_ADDITIONAL_PROJECTS)
             pmcs = list(sorted(pmcs))
 
-    prefs: dict = {"credentials": {}, "github": github_data, "pmcs": pmcs, "all_projects": list(all_projects), "podlings": server.data.podlings}
+    prefs: dict = {"credentials": {}, "github": github_data, "pmcs": pmcs, "all_projects": list(sorted(all_projects)), "podlings": server.data.podlings}
     if session and session.credentials:
         prefs['credentials'] = {
             "admin": session.credentials.admin,
