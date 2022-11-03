@@ -43,21 +43,19 @@ async def process(
                 }
                 break
     pmcs = []
-    all_projects = list(server.data.pmcs.keys())
+    all_projects = set(server.data.pmcs.keys())
     if session.credentials:
         for project, data in server.data.pmcs.items():
             if session.credentials.uid in data:
                 pmcs.append(project)
         if session.credentials.admin:
-            all_projects.extend(ADMIN_ADDITIONAL_PROJECTS)
-            all_projects = list(sorted(all_projects))
+            all_projects.update(ADMIN_ADDITIONAL_PROJECTS)
         elif session.credentials.member:
-            all_projects.extend(EXEC_ADDITIONAL_PROJECTS)
+            all_projects.update(EXEC_ADDITIONAL_PROJECTS)
             pmcs.extend(EXEC_ADDITIONAL_PROJECTS)
             pmcs = list(sorted(pmcs))
-            all_projects = list(sorted(all_projects))
 
-    prefs: dict = {"credentials": {}, "github": github_data, "pmcs": pmcs, "all_projects": all_projects, "podlings": server.data.podlings}
+    prefs: dict = {"credentials": {}, "github": github_data, "pmcs": pmcs, "all_projects": list(all_projects), "podlings": server.data.podlings}
     if session and session.credentials:
         prefs['credentials'] = {
             "admin": session.credentials.admin,
