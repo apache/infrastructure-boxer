@@ -8,6 +8,8 @@ ExecStart=/usr/local/bin/pipenv run python3 main.py --config /opt/boxer/boxer.ya
 Restart=always
 User=www-data
 Group=www-data
+StandardError=journal
+StandardOutput=journal
 
 [Install]
 WantedBy=multi-user.target
