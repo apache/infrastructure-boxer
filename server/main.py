@@ -136,6 +136,7 @@ class Server(plugins.basetypes.Server):
                     sys.stderr.write("API Endpoint %s got into trouble (%s): \n" % (request.path, eid))
                     for line in err.split("\n"):
                         sys.stderr.write("%s: %s\n" % (eid, line))
+                    sys.stderr.flush()
                     return aiohttp.web.Response(
                         headers=headers, status=500, text="API error occurred. The application journal will have "
                                                           "information. Error ID: %s" % eid
