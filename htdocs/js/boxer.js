@@ -297,6 +297,16 @@ let search_timer = null;
 let search_query = "";
 let previous_query = "";
 
+async function lock_account(asf_id) {
+    let res = await GET('api/invite.json?lock=' + asf_id);
+    if (res.okay === true) {
+        alert("Account locked and unlinked");
+        location.reload();
+    } else {
+        alert(res.message);
+    }
+}
+
 async function search_fetch(obj) {
     if (search_query == previous_query) return;
     previous_query = search_query;
@@ -358,7 +368,7 @@ async function search_fetch(obj) {
             td = document.createElement('td');
             let a_lock = document.createElement('a');
             a_lock.innerText = "lock account";
-            a_lock.href = `javascript:void(lock_account(${result.asf_id));`
+            a_lock.href = `javascript:void(lock_account('${result.asf_id}'));`
             td.appendChild(a_lock);
             tr.appendChild(td);
 
