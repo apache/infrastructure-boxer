@@ -353,6 +353,14 @@ async function search_fetch(obj) {
                 td.innerHTML= "MFA not enabled on GitHub <sup>[3]</sup>";
             }
             tr.appendChild(td);
+            
+            // Admin links
+            td = document.createElement('td');
+            let a_lock = document.createElement('a');
+            a_lock.innerText = "lock account";
+            a_lock.href = `javascript:void(lock_account(${result.asf_id));`
+            td.appendChild(a_lock);
+            tr.appendChild(td);
 
             obj.appendChild(tr);
         }
@@ -395,6 +403,9 @@ function search_page(canvas, query) {
     tr.appendChild(th);
     th = document.createElement('th');
     th.innerText = "Status";
+    tr.appendChild(th);
+    th = document.createElement('th');
+    th.innerText = "Actions";
     tr.appendChild(th);
     table.appendChild(tr);
     let results = document.createElement('tbody');
