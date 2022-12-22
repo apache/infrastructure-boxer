@@ -31,8 +31,10 @@ async def process(
         for person in server.data.people:
             if person.asf_id == user_to_lock:
                 print(f"Unlinking GitHub login from user {user_to_lock} (locked by {session.credentials.uid})")
-                person.github_login = ""
-                person.save(server.database.client)
+                # Remove from sqlite
+                person.remove(server.database.client)
+                # Remove from server cache
+                server.data.people.remove(person)
                 return {
                     "okay": True,
                     "message": "unlinked from GitHub",

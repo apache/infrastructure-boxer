@@ -14,6 +14,12 @@ class Committer:
             "updated": datetime.datetime.now(),
         }
         dbhandle.upsert("ids", document, asfid=self.asf_id)
+    
+    def remove(self, dbhandle: asfpy.sqlite.DB):
+        """Removes a user from the db, used for lockouts"""
+        if self.asf_id:
+            dbhandle.delete("ids", asfid=self.asf_id)
+
 
     def __init__(
         self, asf_id: str, linkdb: asfpy.sqlite.DB,
