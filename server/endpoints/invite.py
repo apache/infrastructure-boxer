@@ -35,7 +35,6 @@ async def process(
                 person.save(server.database.client)
                 return {
                     "okay": True,
-                    "reauth": True,
                     "message": "unlinked from GitHub",
                 }
         return {
