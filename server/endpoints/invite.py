@@ -25,6 +25,24 @@ import aiohttp
 async def process(
         server: plugins.basetypes.Server, session: plugins.session.SessionObject, indata: dict
 ) -> dict:
+    # Administrative locking of account
+    if indata.get('lock') and session.credentials and session.credentials.admin:
+        user_to_lock = indata.get('lock')
+        for person in server.data.people:
+            if person.asf_id == user_to_lock:
+                print(f"Unlinking GitHub login from user {user_to_lock} (locked by {session.credentials.uid})")
+                person.github_login = ""
+                person.save(server.database.client)
+                return {
+                    "okay": True,
+                    "reauth": True,
+                    "message": "unlinked from GitHub",
+                }
+        return {
+            "okay": False,
+            "message": "Could not unlink - account not found in database!",
+        }
+    # Unlinking personal account
     if indata.get('unlink') and session.credentials:
         for person in server.data.people:
             if person.asf_id == session.credentials.uid:
