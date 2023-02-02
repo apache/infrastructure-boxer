@@ -159,13 +159,13 @@ function show_page_profile(canvas, login) {
         iconimg.style.height = '24px';
         icon.appendChild(iconimg);
         let xtxt = document.createElement('td');
-        xtxt.innerText = `Authenticated at GitHub as: ${login.github.login} (`;
+        xtxt.innerText = `Authenticated at GitHub as: ${login.github.login} `;
         let unlink = document.createElement('a');
+        unlink.setAttribute('class',' unlink');
         unlink.setAttribute('href', '#');
         unlink.innerText = "unlink account";
         unlink.addEventListener('click', unlink_github);
         xtxt.appendChild(unlink);
-        xtxt.appendChild(txt(")"));
         tr.appendChild(icon);
         tr.appendChild(xtxt);
         boxerstatus.appendChild(tr);
