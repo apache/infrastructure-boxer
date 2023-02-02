@@ -704,7 +704,13 @@ async function prime() {
         return
     }
 
-
+    // Hide admin nav items if not admin
+    if (!login.credentials.admin) {
+        const adminlinks = document.getElementsByClassName("adminonly");
+        for (const navitem of adminlinks) {
+            navitem.style.display = "none";
+        }
+    }
 
     if (!formdata.action || formdata.action == 'preferences') {
         // Not authed via GitHub yet
