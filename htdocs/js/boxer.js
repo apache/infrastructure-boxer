@@ -159,13 +159,13 @@ function show_page_profile(canvas, login) {
         iconimg.style.height = '24px';
         icon.appendChild(iconimg);
         let xtxt = document.createElement('td');
-        xtxt.innerText = `Authenticated at GitHub as: ${login.github.login} (`;
+        xtxt.innerText = `Authenticated at GitHub as: ${login.github.login} `;
         let unlink = document.createElement('a');
+        unlink.setAttribute('class',' unlink');
         unlink.setAttribute('href', '#');
         unlink.innerText = "unlink account";
         unlink.addEventListener('click', unlink_github);
         xtxt.appendChild(unlink);
-        xtxt.appendChild(txt(")"));
         tr.appendChild(icon);
         tr.appendChild(xtxt);
         boxerstatus.appendChild(tr);
@@ -704,7 +704,13 @@ async function prime() {
         return
     }
 
-
+    // Hide admin nav items if not admin
+    if (!login.credentials.admin) {
+        const adminlinks = document.getElementsByClassName("adminonly");
+        for (const navitem of adminlinks) {
+            navitem.style.display = "none";
+        }
+    }
 
     if (!formdata.action || formdata.action == 'preferences') {
         // Not authed via GitHub yet
