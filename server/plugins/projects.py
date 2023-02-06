@@ -158,5 +158,15 @@ async def compile_data(
                 org.add_project(name=project, committers=committers, pmc=pmc)
             xproject = org.projects[project]
             xproject.add_repository(repo, repo.private)
+            # LDAP additional owner override
+            if lc.ldap_override:
+                repo_alts = lc.ldap_override.get("repository_alternate_owners")  # Dict of repo -> list of alt owners
+                if repo_alts:
+                    alts_for_this_repo = repo_alts.get(repo.filename, [])    # list of alt owners (projects, e.g. httpd, tomcat, members)
+                    for alt_project in alts_for_this_repo:
+                        if alt_project in org.projects:                  # If alt project is defined, add the repo to their list
+                            print(f"Adding alternate owner of {repo.filename}: {alt_project}")
+                            org.projects[alt_project].add_repository(repo, repo.private)
+
 
     return org
