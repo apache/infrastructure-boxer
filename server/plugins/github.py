@@ -540,8 +540,8 @@ class GitHubTeam:
         """Assigns a list of repositories to a team. Returns a tuple of repos added and removed from the team"""
         repos_assigned = set(self.repos)
         repos_to_assign = set(repositories)
-        to_add = repos_to_assign - repos_assigned
-        to_remove = repos_to_assign - repos_to_assign
+        to_add = repos_to_assign - repos_assigned     # add: all repos belonging to project, minus already assigned
+        to_remove = repos_assigned - repos_to_assign  # remove: already assigned, minus all repos belonging to project
         for repo in to_add:
             await self.add_repository(repo)
         for repo in to_remove:
