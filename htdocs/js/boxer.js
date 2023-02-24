@@ -609,7 +609,7 @@ function prep_new_repo(refresh=false, submit=false) {
         document.getElementById('dev').value = `dev@${project}.apache.org`;
     }
     if (!suffix.match(/^[-a-z0-9]*$/)) {
-        frn.innerText = "Invalid repository suffix. Must be alphanumeric characters or dashes only.";
+        frn.innerText = "Invalid repository suffix. Must be lowercase alphanumeric characters or dashes only.";
         return
     }
     if (login_cached.podlings.includes(project)) {
