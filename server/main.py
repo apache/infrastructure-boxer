@@ -115,7 +115,7 @@ class Server(plugins.basetypes.Server):
                     )
             # If a handler hit an exception, we need to print that exception somewhere,
             # either to the web client or stderr:
-            except:  # This is a broad exception on purpose!
+            except Exception:  # This is a broad exception on purpose!
                 if session.database:
                     session.database = None
                 exc_type, exc_value, exc_traceback = sys.exc_info()
