@@ -557,9 +557,9 @@ class GitHubTeam:
         await self.org.api_delete(url)
 
     async def add_repository(self, reponame: str):
-        """Adds a single repository to the team"""
+        """Adds a single repository to the team with the custom 'committers' role (write access plus can create protected tags)"""
         assert (
             self.org.orgid
         ), "Parent GitHubOrganization needs a call to .get_id() prior to membership updates!"
         url = f"https://api.github.com/organizations/{self.org.orgid}/team/{self.id}/repos/{self.org.login}/{reponame}"
-        await self.org.api_put(url, {'permission': 'push'})
+        await self.org.api_put(url, {'permission': 'committers'})
