@@ -202,7 +202,7 @@ async def run_tasks(server: plugins.basetypes.Server):
                     try:
                         ldap_override = yaml.safe_load(open(plugins.ldap.PROJECTS_OVERRIDE))
                         for project, data in ldap_override.items():
-                            if project not in server.data.pmcs:
+                            if project not in server.data.pmcs and project != "repository_alternate_owners":
                                 print(f"Adding override for virtual project {project}")
                                 server.data.pmcs[project] = []  # Empty for now, populate later..?
                     except yaml.YAMLError as err:
