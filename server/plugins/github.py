@@ -8,6 +8,9 @@ import asyncio
 
 GRAPHQL_URL = "https://api.github.com/graphql"
 DEBUG = False  # Set to True to disable GitHub API calls
+GITHUB_RESULTS_PER_QUERY = 40  # Number of results to gather per paginated result. 
+                               # Default is 100, but due to recent issues with timeouts, 
+                               # we have lowered it to 40.
 
 
 class GitHubOrganisation:
@@ -143,7 +146,7 @@ class GitHubOrganisation:
         query = """
         {
             organization(login: "%s") {
-                teams(first: 100, after:%s) {
+                teams(first: %s, after:%s) {
                     pageInfo {
                         hasNextPage
                         endCursor
@@ -183,7 +186,7 @@ class GitHubOrganisation:
             after = "null"
             while next_page:
                 async with session.post(
-                    GRAPHQL_URL, json={"query": query % (self.login, after)}
+                    GRAPHQL_URL, json={"query": query % (self.login, GITHUB_RESULTS_PER_QUERY, after)}
                 ) as rv:
                     js = await rv.json()
                     for edge in js["data"]["organization"]["teams"]["edges"]:
