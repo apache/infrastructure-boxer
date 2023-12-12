@@ -188,6 +188,7 @@ function show_page_profile(canvas, login) {
                 const ghlink = `https://github.com/${gh_org}/${repo}`;
                 let gblink = `https://gitbox.apache.org/repos/asf/${repo}.git`;
                 let private = false;
+                let archived = login.github.metadata[repo].archived;
                 if (login.github.private.includes(repo)) {
                     private = true;
                     let m = repo.match(/^(?:incubator-)?(empire-db|[^-.]+)-?.*/);
@@ -201,6 +202,11 @@ function show_page_profile(canvas, login) {
                 repospan.style.width = "480px";
                 repospan.innerText = repo + ".git";
                 repospan.style.color = private ? "red" : "black";
+                if (archived) {
+                    repospan.style.color = "grey";
+                    repospan.style.textDecoration = "line-through";
+                    repospan.innerText += " (archived)";
+                }
                 const gha = document.createElement('a');
                 gha.style.marginLeft = "20px";
                 gha.setAttribute("href", ghlink);
