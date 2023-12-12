@@ -21,11 +21,23 @@ class Repository:
     filename: str
     filepath: str
     project: str
+    description: str
+    archived: bool
 
     def __init__(self, private, filepath):
         self.private = private
         self.filename = os.path.basename(filepath).replace('.git', '')
         self.filepath = filepath
+        nocommit_file = os.path.join(filepath, "nocommit")
+        desc_file = os.path.join(filepath, "description")
+        self.archived = os.path.exists(nocommit_file)  # If a nocommit file exists within the .git dir, it is archived/read-only
+        self.description = ""
+        if os.path.isfile(desc_file):
+            try:
+                self.description = open(desc_file).read()
+            except Exception:
+                print(f"Could not read description of {filepath}, setting to blank")
+
         m = re.match(r"^(?:incubator-)?(empire-db|[^-.]+)-?.*(?:\.git)?$", self.filename)
         if m:
             self.project = m.group(1)

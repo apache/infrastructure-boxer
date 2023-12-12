@@ -38,6 +38,7 @@ async def process(
                 github_data = {
                     "repositories": [x.filename for x in p.repositories if x.filename in server.data.github_repos],
                     "private": [x.filename for x in p.repositories if x.private and x.filename in server.data.github_repos],
+                    "metadata": {repo.filename: {"archived": repo.archived, "description": repo.description} for repo in p.repositories if repo.filename in server.data.github_repos},
                     "mfa": p.github_mfa,
                     "login": p.github_login,
                 }
