@@ -219,14 +219,27 @@ function show_page_profile(canvas, login) {
                 gba.innerText = "GitBox";
                 const visispan = document.createElement('span');
                 visispan.style.marginLeft = "20px";
+                visispan.style.width = "8rem";
                 visispan.style.display = "inline-block";
                 visispan.innerText = private ? "Private repository" : "Public repository";
                 visispan.style.color = private ? "red" : "black";
+                const desc = document.createElement('span');
+                desc.style.display = "inline-block";
+                desc.style.width = "520px";
+                desc.style.lineHeight = "100%";
+                desc.style.whiteSpace = "nowrap";
+                desc.style.textOverflow = "ellipsis";
+                desc.style.overflowX = "hidden";
+                desc.style.color = "grey";
+                desc.style.marginLeft = "12px";
+                desc.style.fontSize = "0.8rem";
+                desc.innerText = login.github.metadata[repo].description;
                 const li = document.createElement('li');
                 li.appendChild(repospan);
                 li.appendChild(gha);
                 li.appendChild(gba);
                 li.appendChild(visispan);
+                li.appendChild(desc);
                 ul.appendChild(li);
             }
         } else {
@@ -369,7 +382,7 @@ async function search_fetch(obj) {
                 td.innerHTML= "MFA not enabled on GitHub <sup>[3]</sup>";
             }
             tr.appendChild(td);
-            
+
             // Admin links
             td = document.createElement('td');
             let a_lock = document.createElement('a');
@@ -641,13 +654,13 @@ function prep_new_repo(refresh=false, submit=false) {
 async function create_new_repo(project, name, priv, title, commit, dev) {
     blurbg(true);
     let rv = await POST("api/repository.json" , {
-            action: 'create' ,
-            repository: name,
-            private: priv,
-            title: title,
-            commit: commit,
-            issue: dev
-        });
+        action: 'create' ,
+        repository: name,
+        private: priv,
+        title: title,
+        commit: commit,
+        issue: dev
+    });
     blurbg(false);
     if (rv.okay == true) {
         let canvas = document.getElementById('main');
