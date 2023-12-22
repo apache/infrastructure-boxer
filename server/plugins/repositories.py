@@ -37,8 +37,10 @@ class Repository:
                 self.description = open(desc_file).read()
             except Exception:
                 print(f"Could not read description of {filepath}, setting to blank")
-
-        m = re.match(r"^(?:incubator-)?(empire-db|[^-.]+)-?.*(?:\.git)?$", self.filename)
+        # Determine project name from repo name:
+        # incubator-foo-bar.git -> foo
+        # httpd.blah.git -> httpd, etc.
+        m = re.match(r"^(?:incubator-)?(empire-db|[^-.]+)[-.]?.*(?:\.git)?$", self.filename)
         if m:
             self.project = m.group(1)
         else:
