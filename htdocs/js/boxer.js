@@ -623,7 +623,7 @@ function new_repo_prompt(canvas, login) {
 
 
 function prep_new_repo(refresh=false, submit=false) {
-    let frn = document.getElementById('incubator-');
+    let frn = document.getElementById('final_repo_name');
     let project = document.getElementById('project').value;
     let suffix = document.getElementById('suffix').value;
     let priv = login_cached.credentials.admin ? document.getElementById('private').checked : false;
