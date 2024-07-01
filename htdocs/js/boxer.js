@@ -543,7 +543,7 @@ function new_repo_prompt(canvas, login) {
     label = document.createElement('label');
     label.setAttribute("for", "iincubator_prefix");
     label.innerText = "Include incubator prefix: ";
-    canvas.appendChild(kvpair(label, priv));
+    canvas.appendChild(kvpair(label, incubator));
 
     // Private?
     if (login_cached.credentials.admin) {
