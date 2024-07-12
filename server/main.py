@@ -71,7 +71,6 @@ class Server(plugins.basetypes.Server):
         self, request: aiohttp.web.BaseRequest
     ) -> aiohttp.web.Response:
         """Generic handler for all incoming HTTP requests"""
-        resp: aiohttp.web.Response
 
         # Define response headers first...
         headers = {
@@ -146,7 +145,7 @@ class Server(plugins.basetypes.Server):
                 headers=headers, status=404, text="API Endpoint not found!"
             )
 
-    async def server_loop(self, loop: asyncio.AbstractEventLoop):  # Note, loop never used.
+    async def server_loop(self, _loop: asyncio.AbstractEventLoop):  # Note, _loop never used.
         self.server = aiohttp.web.Server(self.handle_request)
         runner = aiohttp.web.ServerRunner(self.server)
         await runner.setup()

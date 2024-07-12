@@ -17,7 +17,6 @@
 
 import plugins.basetypes
 import plugins.session
-import aiohttp
 
 """ GitHub org admin user search endpoint for Boxer"""
 
@@ -52,5 +51,5 @@ async def process(
         }
 
 
-def register(server: plugins.basetypes.Server):
+def register(_server: plugins.basetypes.Server):
     return plugins.basetypes.Endpoint(process)
