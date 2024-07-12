@@ -154,7 +154,7 @@ async def compile_data(
                     discovered += 1
                     # print(f"Discovered project: {project} - {len(committers)} committers, {len(pmc)} in pmc")
                     if discovered % 50 == 0:
-                        print("Discovered %u projects so far..." % discovered)
+                        print("Discovered %d projects so far..." % discovered)
                 org.add_project(name=project, committers=committers, pmc=pmc)
             xproject = org.projects[project]
             xproject.add_repository(repo, repo.private)

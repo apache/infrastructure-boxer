@@ -199,13 +199,13 @@ class GitHubOrganisation:
                                 f"{slug} has {total_members} members, need to fill specifically..."
                             )
                             await team.get_members()
-                            print("Filled with %u members!" % len(team.members))
+                            print("Filled with %d members!" % len(team.members))
                         if total_repos > 100:
                             print(
                                 f"{slug} has {total_repos} repos assigned, need to fill specifically..."
                             )
                             await team.get_repositories()
-                            print("Filled with %u repos!" % len(team.repos))
+                            print("Filled with %d repos!" % len(team.repos))
                         teams.append(team)
                     endcursor = js["data"]["organization"]["teams"]["pageInfo"]["endCursor"]
                     next_page = endcursor not in [None, "null"]  # GraphQL is broken, look for null value here, do not trust hasNextPage
@@ -299,7 +299,7 @@ class GitHubOrganisation:
                     )
         mfa_enabled = len([x for x in mfa.values() if x is True])
         mfa_disabled = len([x for x in mfa.values() if x is False])
-        print("%u with 2FA, %u without!" % (mfa_enabled, mfa_disabled))
+        print("%d with 2FA, %d without!" % (mfa_enabled, mfa_disabled))
         return mfa
 
     async def add_team(self, project: str, role: str = "committers") -> typing.Optional[int]:
