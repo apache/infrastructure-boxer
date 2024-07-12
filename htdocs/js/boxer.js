@@ -568,7 +568,7 @@ function new_repo_prompt(canvas, login) {
     commit.setAttribute("onkeyup", "prep_new_repo();")
     label = document.createElement('label');
     label.setAttribute("for", "commit");
-    label.innerText = "Commit mailing list target: ";
+    label.innerText = "(*) Commit mailing list target: ";
     canvas.appendChild(kvpair(label, commit));
 
     // Dev mail target
@@ -580,7 +580,7 @@ function new_repo_prompt(canvas, login) {
     dev.setAttribute("onkeyup", "prep_new_repo();")
     label = document.createElement('label');
     label.setAttribute("for", "dev");
-    label.innerText = "Issue/PR mailing list target: ";
+    label.innerText = "(*) Issue/PR mailing list target: ";
     canvas.appendChild(kvpair(label, dev));
 
 
@@ -616,7 +616,7 @@ function new_repo_prompt(canvas, login) {
     a.setAttribute("href" , "https://s.apache.org/asfyaml");
     a.setAttribute("target" , "_blank");
     a.innerText = ".asf.yaml";
-    canvas.appendChild(document.createTextNode("You may fine tune these settings later using "));
+    canvas.appendChild(document.createTextNode("(*) You may fine tune these settings later using "));
     canvas.appendChild(a);
     canvas.appendChild(document.createTextNode(" in the main branch of your repository."));
 }
