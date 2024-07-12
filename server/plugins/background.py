@@ -112,17 +112,17 @@ async def run_tasks(server: plugins.basetypes.Server):
         limit, used, resets = await asf_github_org.rate_limit_rest()
         while used >= (limit-25):
             how_long_to_wait = resets - int(time.time()-1)
-            print("GitHub REST rate limit reached, waiting till %u (%u seconds)" % (resets, how_long_to_wait))
+            print("GitHub REST rate limit reached, waiting till %d (%d seconds)" % (resets, how_long_to_wait))
             await asyncio.sleep(how_long_to_wait)
             limit, used, resets = await asf_github_org.rate_limit_rest()
-        print("Used %u out of %u REST tokens this hour." % (used, limit))
+        print("Used %d out of %d REST tokens this hour." % (used, limit))
         limit, used, resets = await asf_github_org.rate_limit_graphql()
         while used >= (limit-25):
             how_long_to_wait = resets - int(time.time()-1)
-            print("GitHub GraphQL rate limit reached, waiting till %u (%u seconds)" % (resets, how_long_to_wait))
+            print("GitHub GraphQL rate limit reached, waiting till %d (%d seconds)" % (resets, how_long_to_wait))
             await asyncio.sleep(how_long_to_wait)
             limit, used, resets = await asf_github_org.rate_limit_graphql()
-        print("Used %u out of %u GraphQL tokens this hour." % (used, limit))
+        print("Used %d out of %d GraphQL tokens this hour." % (used, limit))
 
         async with ProgTimer("Gathering list of repositories on gitbox"):
             try:
@@ -236,6 +236,6 @@ async def run_tasks(server: plugins.basetypes.Server):
             used_gql -= used
         time_taken = time.time() - now
         print(
-            "Background task run finished after %u seconds. Used %u GraphQL tokens for this." % (time_taken, used_gql)
+            "Background task run finished after %d seconds. Used %d GraphQL tokens for this." % (time_taken, used_gql)
         )
         await asyncio.sleep(server.config.tasks.refresh_rate)
