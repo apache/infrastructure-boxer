@@ -84,14 +84,15 @@ async def process(
         # Check LDAP ownership
         if not session.credentials.admin and not (session.credentials.member and pmc in EXEC_ADDITIONAL_PROJECTS):
             async with plugins.ldap.LDAPClient(server.config.ldap) as lc:
-                committer_list, pmc_list = await lc.get_members(pmc)
+                _committer_list, pmc_list = await lc.get_members(pmc)
                 if not pmc_list:
                     return {"okay": False, "message": "Invalid project prefix '%s' specified" % pmc}
-                if session.credentials.uid not in pmc_list:
+                if uid not in pmc_list:
                     return {"okay": False, "message": "Only (I)PMC members of this project may create repositories"}
 
-        repourl_gh = f"https://github.com/{server.config.github.org}/{reponame}"
-        repourl_gb = f"https://gitbox.apache.org/repos/asf/{reponame}"
+        # These are used in the template via locals()
+        repourl_gh = f"https://github.com/{server.config.github.org}/{reponame}" # pylint: disable=possibly-unused-variable
+        repourl_gb = f"https://gitbox.apache.org/repos/asf/{reponame}" # pylint: disable=possibly-unused-variable
         if not private:
             repo_path = os.path.join(server.config.repos.public, reponame)
             if os.path.exists(repo_path):
@@ -139,7 +140,7 @@ our $javascript = "/static/gitweb.js";
                         '/usr/bin/sudo', '/usr/sbin/service', 'apache2', 'graceful',
                     stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
                     )
-                stdout, stderr = await proc.communicate()
+                _stdout, stderr = await proc.communicate()
                 if proc.returncode != 0:
                     return {"okay": False, "message": "Could not apply pre-create security controls: " + stderr.encode("utf-8")}
 
@@ -173,7 +174,7 @@ our $javascript = "/static/gitweb.js";
             proc = await asyncio.create_subprocess_exec(
                 GB_CLONE_EXEC, *params, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
             )
-            stdout, stderr = await proc.communicate()
+            _stdout, stderr = await proc.communicate()
             # Everything went okay?
             if proc.returncode == 0:
                 # Add the apache.dev setting
@@ -215,5 +216,5 @@ async def create_repo(server, repo, title, pmc, private = False):
             return txt
 
 
-def register(server: plugins.basetypes.Server):
+def register(_server: plugins.basetypes.Server):
     return plugins.basetypes.Endpoint(process)

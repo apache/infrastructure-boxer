@@ -43,7 +43,7 @@ async def process(
     try:
         await asf_github_org.get_id()  # Must be called in order to elevate access.
         await asf_github_org.api_patch(f"https://api.github.com/repos/{server.config.github.org}/{repo}", {"archived": True})
-    except AssertionError as e:
+    except AssertionError as _e:
         return {"okay": False, "message": "Could not archive repository on GitHub."}
 
     # Archive on GitBox:
@@ -60,5 +60,5 @@ async def process(
 
     return {"okay": True, "message": "Repository successfully archived."}
 
-def register(server: plugins.basetypes.Server):
+def register(_server: plugins.basetypes.Server):
     return plugins.basetypes.Endpoint(process)

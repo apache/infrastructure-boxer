@@ -8,8 +8,6 @@
       github_client_secret: bcfdgefa572564576
 """
 
-import re
-import requests
 import plugins.basetypes
 import typing
 import aiohttp

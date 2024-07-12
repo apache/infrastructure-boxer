@@ -83,7 +83,7 @@ async def process(
                 "invitee_id": session.credentials.github_id,
                 "role": "direct_member",
             }) as rv:
-                response = await rv.json()
+                _response = await rv.json()
                 if rv.status == 201:
                     return {
                         "okay": True,
@@ -101,5 +101,5 @@ async def process(
         }
 
 
-def register(server: plugins.basetypes.Server):
+def register(_server: plugins.basetypes.Server):
     return plugins.basetypes.Endpoint(process)

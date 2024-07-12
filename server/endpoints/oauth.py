@@ -24,7 +24,6 @@ import plugins.oauthGithub
 import plugins.projects
 import typing
 import aiohttp.web
-import hashlib
 
 
 async def process(
@@ -86,5 +85,5 @@ async def process(
     return {"okay": False, "message": "Could not process OAuth login!"}
 
 
-def register(server: plugins.basetypes.Server):
+def register(_server: plugins.basetypes.Server):
     return plugins.basetypes.Endpoint(process)

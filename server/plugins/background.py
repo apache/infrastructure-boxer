@@ -230,7 +230,7 @@ async def run_tasks(server: plugins.basetypes.Server):
                 print("Could not write GH map file!")
                 print(e)
         
-        alimit, aused, aresets = await asf_github_org.rate_limit_graphql()
+        _alimit, aused, _aresets = await asf_github_org.rate_limit_graphql()
         used_gql = aused
         if used < aused:
             used_gql -= used
