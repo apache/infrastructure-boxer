@@ -1,7 +1,6 @@
 name: PyLint
 on:
   push:
-    branch: master
     paths:
       - '**/*.py'
       - '**/linting.yml'
