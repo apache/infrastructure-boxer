@@ -665,6 +665,7 @@ function prep_new_repo(refresh=false, submit=false) {
                 if (!window.confirm(`WARNING: The requested repository name, ${repo_name}, contains the project name twice! Are you absolutely sure you want this?`)) {
                     return
                 }
+            }
             create_new_repo(project, repo_name, priv, repo_title, repo_commit, repo_dev);
         }
     }
