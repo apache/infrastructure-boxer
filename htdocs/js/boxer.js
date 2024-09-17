@@ -660,6 +660,11 @@ function prep_new_repo(refresh=false, submit=false) {
     document.getElementById('sbmt').disabled = false;
     if (submit) {
         if (window.confirm(`This will create ${repo_name}. Are you sure you wish to continue?`)) {
+            // INFRA-26130 et al: Avoid double names like openserverless-openserverless-foo.git
+            if (suffix && suffix.startsWith(project)) {
+                if (!window.confirm(`WARNING: The requested repository name, ${repo_name}, contains the project name twice! Are you absolutely sure you want this?`)) {
+                    return
+                }
             create_new_repo(project, repo_name, priv, repo_title, repo_commit, repo_dev);
         }
     }
