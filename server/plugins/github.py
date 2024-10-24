@@ -138,6 +138,11 @@ class GitHubOrganisation:
         async with aiohttp.ClientSession(headers=self.api_headers) as session:
             async with session.post(GRAPHQL_URL, json={"query": query}) as rv:
                 js = await rv.json()
+                if not js or "data" not in js:
+                    print("Could not grab graphql data, assuming it's broken for now.")
+                    # Fake a response that makes us wait a while:
+                    # 500 used, out of 500, and it resets in 15 minutes time (time+900 secs)
+                    return 500, 500, int(time.time()+900)
                 resets = dateutil.parser.parse(js["data"]["rateLimit"]["resetAt"]).timestamp()
                 return js["data"]["rateLimit"]["limit"], js["data"]["rateLimit"]["used"], resets
 

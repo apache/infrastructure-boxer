@@ -132,9 +132,14 @@ async def run_tasks(server: plugins.basetypes.Server):
                 await asyncio.sleep(10)
                 continue
 
-        async with ProgTimer("Gathering MFA status of GitHub users"):
-            server.data.mfa = await asf_github_org.get_mfa_status()
-
+        try:
+            async with ProgTimer("Gathering MFA status of GitHub users"):
+                server.data.mfa = await asf_github_org.get_mfa_status()
+        except KeyError:  # Bad github response, graphql down?
+            if not server.data.mfa: # No original data, we can't continue!
+                print("Could not grab MFA data from GitHub's GraphQL interface and I have no MFA history, need to abort and try later!")
+                continue
+       
         async with ProgTimer("Gathering list of repositories on GitHub"):
             server.data.github_repos = await asf_github_org.load_repositories()
             print(f"Found {len(server.data.github_repos)} repositories on GitHub")
