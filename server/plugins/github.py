@@ -5,6 +5,7 @@ import json
 import plugins.projects
 import dateutil.parser
 import asyncio
+import time
 
 GRAPHQL_URL = "https://api.github.com/graphql"
 DEBUG = False  # Set to True to disable GitHub API calls
