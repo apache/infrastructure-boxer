@@ -4,7 +4,7 @@ Description=ASF Boxer Service
 [Service]
 Type=simple
 WorkingDirectory=/opt/boxer/server
-ExecStart=/usr/local/bin/pipenv run python3 main.py --config /opt/boxer/boxer.yaml
+ExecStart=/usr/bin/env python3 main.py --config /opt/boxer/boxer.yaml
 Restart=always
 User=www-data
 Group=www-data
