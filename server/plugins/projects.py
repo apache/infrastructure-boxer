@@ -144,6 +144,7 @@ async def compile_data(
     org = Organization(linkdb=linkdb)
     discovered = 0
     async with plugins.ldap.LDAPClient(ldap) as lc:
+        # Gather LDAP records of all projects first
         for repo in repositories:
             project = repo.project
             if not project:
@@ -156,6 +157,11 @@ async def compile_data(
                     if discovered % 50 == 0:
                         print("Discovered %d projects so far..." % discovered)
                 org.add_project(name=project, committers=committers, pmc=pmc)
+        # Then look at overrides
+        for repo in repositories:
+            project = repo.project
+            if not project:
+                continue
             xproject = org.projects[project]
             xproject.add_repository(repo, repo.private)
             # LDAP additional owner override
