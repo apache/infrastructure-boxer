@@ -557,6 +557,12 @@ function new_repo_prompt(canvas, login) {
         label.setAttribute("for", "private");
         label.innerText = "Make repository private*: ";
         canvas.appendChild(kvpair(label, priv));
+    } else {
+        canvas.appendChild(br());
+        canvas.appendChild(document.createTextNode("Sorry, you don't have permission to create a private repository."));
+        canvas.appendChild(br());
+        canvas.appendChild(document.createTextNode("Please see:"));
+        canvas.appendChild(br());
     }
 
     // Commit mail target
