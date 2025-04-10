@@ -13,7 +13,7 @@ tasks:
 oauth:
   authoritative_domains:
     - oauth.apache.org
-  admins: christ cml dfoulks gmcdonald gstein humbedooh
+  admins: cml dfoulks gmcdonald humbedooh iroh
   github_client_id: foo
   github_client_secret: foo
 
