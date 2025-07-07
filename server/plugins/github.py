@@ -53,12 +53,26 @@ class GitHubOrganisation:
            This must be called once before membership or repository additions/deletions, to ensure
            we can perform these calls using database IDs only."""
         if self.orgid is None:
+            attempts = 0
             async with aiohttp.ClientSession(headers=self.api_headers) as session:
-                url = f"https://api.github.com/orgs/{self.login}"
-                async with session.get(url) as rv:
-                    js = await rv.json()
-                    self.orgid = js["id"]
+            url = f"https://api.github.com/orgs/{self.login}"
+            while attempts < 10:
+                try:
+                  async with session.get(url) as rv:
+                      js = await rv.json()
+                      if js and isinstance(js, dict) and "id" in js:
+                          self.orgid = js["id"]
+                          return self.orgid
+                      else:
+                          raise Exception(f"GitHub did not return organizational data from {url}")
+                except Exception as e:
+                    print(f"Ran into an exception while processing github metadata from {url}: {e}")
+                    print("Waiting 15 seconds, then trying again")
+                    await asyncio.sleep(15)
+                    attempts += 1
+            return None  # Can't get info, bail :(
         return self.orgid
+            
 
     async def api_delete(self, url: str):
         if DEBUG:
