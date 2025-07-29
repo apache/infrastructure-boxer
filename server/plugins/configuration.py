@@ -24,7 +24,6 @@ class TaskConfig:
 class OAuthConfig:
     def __init__(self, subyaml: dict):
         self.authoritative_domains: typing.List[str] = subyaml.get("authoritative_domains", [])
-        self.admins: typing.List[str] = subyaml.get("admins", "").split(' ')
         self.github_client_id: str = subyaml.get("github_client_id", "")
         self.github_client_secret: str = subyaml.get("github_client_secret", "")
         assert isinstance(self.github_client_id, str), "GitHub client ID must be a string"
