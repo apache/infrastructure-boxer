@@ -49,6 +49,7 @@ async def process(
             if person.asf_id == session.credentials.uid:
                 print(f"Unlinking GitHub login from user {person.asf_id}")
                 person.github_login = ""
+                # LDAP unlink will be implemented in a subsequent revision
                 person.save(server.database.client)
                 return {
                     "okay": True,

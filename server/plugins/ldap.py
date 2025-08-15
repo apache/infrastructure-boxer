@@ -130,6 +130,30 @@ class LDAPClient:
             print(f"LDAP Exception for group {group}: {e}")
             return [], []
 
+    async def set_user_github_primary(self, uid: str, username: str, user_id: int):
+        if not self.connection:
+            raise RuntimeError("LDAP Not connected")
+        dn = f"uid={uid},{self.config.userbase}"
+        rv = await self.connection.search(
+            dn, bonsai.LDAPSearchScope.BASE, None, [
+                "objectClass",
+                "githubPrimaryUsername",
+                "githubPrimaryUserID",
+            ]
+        )
+        if (not rv) or (len(rv) == 0):
+            raise RuntimeError(f"LDAP user not found: {dn}")
+        entry = rv[0]
+        # Ensure asf-committer OC exists to write the githubPrimary* attributes
+        if "objectClass" in entry:
+            if not any((oc.lower() == "asf-committer") for oc in entry["objectClass"]):
+                entry["objectClass"].append("asf-committer")
+        else:
+            entry["objectClass"] = ["asf-committer"]
+        entry["githubPrimaryUsername"] = [str(username)]
+        entry["githubPrimaryUserID"] = [int(user_id)]
+        await entry.modify()
+
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if self.connection:
             self.connection.close()
