@@ -137,21 +137,21 @@ class LDAPClient:
         rv = await self.connection.search(
             dn, bonsai.LDAPSearchScope.BASE, None, [
                 "objectClass",
-                "githubPrimaryUsername",
-                "githubPrimaryUserID",
+                "asf-githubNumericID",
+                "asf-githubStringID",
             ]
         )
         if (not rv) or (len(rv) == 0):
             raise RuntimeError(f"LDAP user not found: {dn}")
         entry = rv[0]
-        # Ensure asf-committer OC exists to write the githubPrimary* attributes
+        # Ensure asf-committer OC exists to write the asf-github*ID attributes
         if "objectClass" in entry:
             if not any((oc.lower() == "asf-committer") for oc in entry["objectClass"]):
                 entry["objectClass"].append("asf-committer")
         else:
             entry["objectClass"] = ["asf-committer"]
-        entry["githubPrimaryUsername"] = [str(username)]
-        entry["githubPrimaryUserID"] = [int(user_id)]
+        entry["asf-githubNumericID"] = [int(user_id)]
+        entry["asf-githubStringID"] = [str(username)]
         await entry.modify()
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
