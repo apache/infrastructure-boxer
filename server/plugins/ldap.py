@@ -133,7 +133,7 @@ class LDAPClient:
     async def set_user_github_primary(self, uid: str, username: str, user_id: int):
         if not self.connection:
             raise RuntimeError("LDAP Not connected")
-        dn = f"uid={uid},{self.config.userbase}"
+        dn = self.config.userbase % uid
         rv = await self.connection.search(
             dn, bonsai.LDAPSearchScope.BASE, None, [
                 "objectClass",
