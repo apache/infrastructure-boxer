@@ -154,6 +154,26 @@ class LDAPClient:
         entry["asf-githubStringID"] = [str(username)]
         await entry.modify()
 
+    async def unset_user_github_primary(self, uid: str):
+        if not self.connection:
+            raise RuntimeError("LDAP Not connected")
+        dn = self.config.userbase % uid
+        rv = await self.connection.search(
+            dn, bonsai.LDAPSearchScope.BASE, None, [
+                "objectClass",
+                "asf-githubNumericID",
+                "asf-githubStringID",
+            ]
+        )
+        if (not rv) or (len(rv) == 0):
+            raise RuntimeError(f"LDAP user not found: {dn}")
+        entry = rv[0]
+        if "asf-githubNumericID" in entry:
+            del entry["asf-githubNumericID"]
+        if "asf-githubStringID" in entry:
+            del entry["asf-githubStringID"]
+        await entry.modify()
+
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if self.connection:
             self.connection.close()
