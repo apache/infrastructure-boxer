@@ -22,6 +22,7 @@ import plugins.session
 import plugins.oauthGeneric
 import plugins.oauthGithub
 import plugins.projects
+import plugins.ldap
 import typing
 import aiohttp.web
 import hashlib
@@ -77,6 +78,14 @@ async def process(
         person.github_id = session.credentials.github_id
         person.real_name = session.credentials.name
         person.github_mfa = session.credentials.github_login in server.data.mfa and server.data.mfa[session.credentials.github_login]
+        async with plugins.ldap.LDAPClient(server.config.ldap) as lc:
+            try:
+                await lc.set_user_github_primary(session.credentials.uid, person.github_login, int(person.github_id))
+            except Exception:
+                return {
+                    "okay": False,
+                    "message": "Could not persist GitHub link to LDAP"
+                }
         person.save(server.database.client)
         server.data.people.append(person)
         return {

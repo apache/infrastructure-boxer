@@ -17,6 +17,7 @@
 
 import plugins.basetypes
 import plugins.session
+import plugins.ldap
 import aiohttp
 
 """ GitHub org invite endpoint for Boxer"""
@@ -31,6 +32,19 @@ async def process(
         for person in server.data.people:
             if person.asf_id == user_to_lock:
                 print(f"Unlinking GitHub login from user {user_to_lock} (locked by {session.credentials.uid})")
+                try:
+                    async with plugins.ldap.LDAPClient(server.config.ldap) as lc:
+                        await lc.unset_user_github_primary(user_to_lock)
+                except RuntimeError as e:
+                    if "LDAP user not found" in str(e):
+                        return {
+                            "okay": False,
+                            "message": "Could not unlink - LDAP user not found",
+                        }
+                    return {
+                        "okay": False,
+                        "message": "Could not unlink - LDAP error",
+                    }
                 # Remove from sqlite
                 person.remove(server.database.client)
                 # Remove from server cache
@@ -48,7 +62,22 @@ async def process(
         for person in server.data.people:
             if person.asf_id == session.credentials.uid:
                 print(f"Unlinking GitHub login from user {person.asf_id}")
+                try:
+                    async with plugins.ldap.LDAPClient(server.config.ldap) as lc:
+                        await lc.unset_user_github_primary(session.credentials.uid)
+                except RuntimeError as e:
+                    if "LDAP user not found" in str(e):
+                        return {
+                            "okay": False,
+                            "message": "Could not unlink - LDAP user not found",
+                        }
+                    return {
+                        "okay": False,
+                        "message": "Could not unlink - LDAP error",
+                    }
                 person.github_login = ""
+                person.github_id = 0
+                # LDAP unlink will be implemented in a subsequent revision
                 person.save(server.database.client)
                 return {
                     "okay": True,
@@ -65,6 +94,7 @@ async def process(
                 if person.github_login == session.credentials.github_login:
                     print(f"Removing stale GitHub login from user {person.asf_id}")
                     person.github_login = ""
+                    person.github_id = 0
                     person.save(server.database.client)
                     break
         return {
