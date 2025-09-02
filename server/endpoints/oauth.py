@@ -63,21 +63,22 @@ async def process(
             headers={"set-cookie": cookie, "content-type": "application/json"}, status=200, text='{"okay": true}',
         )
     elif rv and oatype == "github" and session.credentials:
+        # If only verifying an account, do not reset the account, just record the github id
+        verify_only = rv["login"] == session.credentials.github_login
         session.credentials.github_login = rv["login"]
         session.credentials.github_id = rv["id"]
-
-        if session.credentials.uid in server.data.people:
-            print(f"Removing stale GitHub link entry for {session.credentials.uid}")
-            server.data.people.remove(session.credentials.uid)
-
-        person = plugins.projects.Committer(
-            asf_id=session.credentials.uid,
-            linkdb=server.database.client,
-        )
-        person.github_login = session.credentials.github_login
-        person.github_id = session.credentials.github_id
-        person.real_name = session.credentials.name
-        person.github_mfa = session.credentials.github_login in server.data.mfa and server.data.mfa[session.credentials.github_login]
+        if not verify_only:
+            if session.credentials.uid in server.data.people:
+                print(f"Removing stale GitHub link entry for {session.credentials.uid}")
+                server.data.people.remove(session.credentials.uid)
+            person = plugins.projects.Committer(
+                asf_id=session.credentials.uid,
+                linkdb=server.database.client,
+            )
+            person.github_login = session.credentials.github_login
+            person.github_id = session.credentials.github_id
+            person.real_name = session.credentials.name
+            person.github_mfa = session.credentials.github_login in server.data.mfa and server.data.mfa[session.credentials.github_login]
         async with plugins.ldap.LDAPClient(server.config.ldap) as lc:
             try:
                 await lc.set_user_github_primary(session.credentials.uid, person.github_login, int(person.github_id))
@@ -86,8 +87,9 @@ async def process(
                     "okay": False,
                     "message": "Could not persist GitHub link to LDAP"
                 }
-        person.save(server.database.client)
-        server.data.people.append(person)
+        if not verify_only:
+            person.save(server.database.client)
+            server.data.people.append(person)
         return {
             "okay": True,
             "message": f"Authed as {session.credentials.github_login}"
