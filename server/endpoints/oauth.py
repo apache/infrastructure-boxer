@@ -81,7 +81,7 @@ async def process(
             person.github_mfa = session.credentials.github_login in server.data.mfa and server.data.mfa[session.credentials.github_login]
         async with plugins.ldap.LDAPClient(server.config.ldap) as lc:
             try:
-                await lc.set_user_github_primary(session.credentials.uid, person.github_login, int(person.github_id))
+                await lc.set_user_github_primary(session.credentials.uid, rv["login"], int(rv["id"]))
             except Exception:
                 return {
                     "okay": False,
