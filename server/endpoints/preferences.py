@@ -56,7 +56,7 @@ async def process(
             all_projects.update(EXEC_ADDITIONAL_PROJECTS)
             pmcs.extend(EXEC_ADDITIONAL_PROJECTS)
             pmcs = list(sorted(pmcs))
-        is_tooling = session.credentials.uid in server.data.pmcs["tooling"]
+        is_tooling = session.credentials.uid in server.data.pmcs.get("tooling", {})
 
     prefs: dict = {"credentials": {}, "github": github_data, "pmcs": pmcs, "all_projects": list(sorted(all_projects)), "podlings": server.data.podlings}
     if session and session.credentials:
