@@ -546,7 +546,7 @@ function new_repo_prompt(canvas, login) {
     canvas.appendChild(kvpair(label, incubator));
 
     // Private?
-    if (login_cached.credentials.admin) {
+    if (login_cached.credentials.admin || login_cached.credentials.tooling) {
         canvas.appendChild(br());
         let priv = document.createElement('input');
         priv.setAttribute("type" , "checkbox");
