@@ -13,7 +13,7 @@ import plugins.github
 import plugins.ldap
 import aiohttp
 import yaml
-from aiohttp.client_exceptions import ContentTypeError
+from aiohttp.client_exceptions import ContentTypeError, ClientPayloadError
 
 class ProgTimer:
     """A simple task timer that displays when a sub-task is begun, ends, and the time taken."""
@@ -177,7 +177,7 @@ async def run_tasks(server: plugins.basetypes.Server):
             try:
                 tmp_teams = await asf_github_org.load_teams()
                 server.data.teams = tmp_teams
-            except (AssertionError, TypeError, ContentTypeError) as e:
+            except (AssertionError, TypeError, ContentTypeError, ClientPayloadError) as e:
                 print("Invalid response from GitHub while trying to fetch latest teams, will use cached response:")
                 print(e)
         if server.data.teams: 
