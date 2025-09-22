@@ -13,6 +13,7 @@ import plugins.github
 import plugins.ldap
 import aiohttp
 import yaml
+from aiohttp.client_exceptions import ContentTypeError
 
 class ProgTimer:
     """A simple task timer that displays when a sub-task is begun, ends, and the time taken."""
