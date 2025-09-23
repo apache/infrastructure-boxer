@@ -64,7 +64,7 @@ async def process(
         )
     elif rv and oatype == "github" and session.credentials:
         # If only verifying an account, do not reset the account, just record the github id
-        verify_only = rv["login"] == session.credentials.github_login
+        verify_only = session.credentials.github_login and rv["login"] == session.credentials.github_login
         session.credentials.github_login = rv["login"]
         session.credentials.github_id = rv["id"]
         if not verify_only:
