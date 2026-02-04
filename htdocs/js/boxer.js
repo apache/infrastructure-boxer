@@ -546,7 +546,7 @@ function new_repo_prompt(canvas, login) {
     canvas.appendChild(kvpair(label, incubator));
 
     // Private?
-    if (login_cached.credentials.admin) {
+    if (login_cached.credentials.admin || login_cached.credentials.tooling) {
         canvas.appendChild(br());
         let priv = document.createElement('input');
         priv.setAttribute("type" , "checkbox");
@@ -626,7 +626,7 @@ function prep_new_repo(refresh=false, submit=false) {
     let frn = document.getElementById('final_repo_name');
     let project = document.getElementById('project').value;
     let suffix = document.getElementById('suffix').value;
-    let priv = login_cached.credentials.admin ? document.getElementById('private').checked : false;
+    let priv = (login_cached.credentials.admin||login_cached.credentials.tooling) ? document.getElementById('private').checked : false;
     let repo_title = 'Apache ' + project;
     let repo_commit = document.getElementById('commit').value;
     let repo_dev = document.getElementById('dev').value;

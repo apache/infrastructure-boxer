@@ -1,3 +1,4 @@
+# Sample configuration file
 
 server:
   port: 8080             # Port to bind to

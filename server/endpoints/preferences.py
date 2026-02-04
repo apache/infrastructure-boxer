@@ -44,6 +44,7 @@ async def process(
                 }
                 break
     pmcs = []
+    is_tooling = False
     all_projects = set(server.data.pmcs.keys())
     if session.credentials:
         for project, data in server.data.pmcs.items():
@@ -55,11 +56,13 @@ async def process(
             all_projects.update(EXEC_ADDITIONAL_PROJECTS)
             pmcs.extend(EXEC_ADDITIONAL_PROJECTS)
             pmcs = list(sorted(pmcs))
+        is_tooling = session.credentials.uid in server.data.pmcs.get("tooling", {})
 
     prefs: dict = {"credentials": {}, "github": github_data, "pmcs": pmcs, "all_projects": list(sorted(all_projects)), "podlings": server.data.podlings}
     if session and session.credentials:
         prefs['credentials'] = {
             "admin": session.credentials.admin,
+            "tooling": is_tooling,
             "uid": session.credentials.uid,
             "email": session.credentials.email,
             "fullname": session.credentials.name,

@@ -10,6 +10,7 @@ class Committer:
         document = {
             "asfid": self.asf_id,
             "githubid": self.github_login,
+            "githubnum": self.github_id,
             "mfa": 1 if self.github_mfa else 0,
             "updated": datetime.datetime.now(),
         }
@@ -33,10 +34,12 @@ class Committer:
             row = None
         if row:
             self.github_login = row["githubid"]
+            self.github_id = row.get("githubnum")
             self.github_mfa = bool(row["mfa"])
             self.real_name = ""
         else:
             self.github_login = None
+            self.github_id = None
             self.github_mfa = False
             self.real_name = ""
 
