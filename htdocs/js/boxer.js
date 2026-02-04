@@ -776,6 +776,8 @@ async function prime() {
         search_page(canvas, formdata.query||"");
     } else if (formdata.action == 'newrepo') {
         new_repo_prompt(canvas, login);
+    } else if (formdata.action == 'defaultbranch') {
+        change_default_branch(canvas, login);
     }
 }
 
@@ -786,4 +788,80 @@ function begin_oauth_github() {
     let ghurl = `https://github.com/login/oauth/authorize?client_id=${gh_client_id}&redirect_uri=${oauth_url}`;
     console.log(ghurl);
     location.href = ghurl;
+}
+
+
+
+function change_default_branch(canvas, login) {
+    canvas.innerText = '';
+
+    let title = document.createElement('h2');
+    title.innerText = "Change default branch:";
+    canvas.appendChild(title);
+
+    let ndb_disclaimer = document.createElement("p");
+    ndb_disclaimer.innerText = "Note: only PMC members of a project may change the default branch of a repository belong to that project."
+    canvas.appendChild(ndb_disclaimer);
+
+    // Repo dropdown
+    let sel = document.createElement('select');
+    sel.setAttribute('id', 'repository');
+    let dl = document.createElement('option');
+    dl.innerText = "--- Select a repository ---";
+    dl.disabled = false;
+    dl.value = "";
+    sel.appendChild(dl);
+    login.github.repositories.sort((a,b) => a.localeCompare(b))
+    for (let repo of login.github.repositories) {
+        let l = document.createElement('option');
+        l.innerText = repo;
+        sel.appendChild(l);
+    }
+    let label = document.createElement('label');
+    label.setAttribute("for", "repository");
+    label.innerText = "Repository: ";
+    canvas.appendChild(kvpair(label, sel));
+
+
+    // New default branch
+    canvas.appendChild(br());
+    let ndb = document.createElement('input');
+    ndb.setAttribute("type" , "text");
+    ndb.setAttribute("id" , "default_branch");
+    label = document.createElement('label');
+    label.setAttribute("for", "default_branch");
+    label.innerText = "New default branch: ";
+    canvas.appendChild(kvpair(label, ndb));
+    let ndb_info = document.createElement("p");
+    nbd_info.innerText = "Please enter the name of an existing branch to set as the default branch. Only type the branch name itself, no refs/heads/foo variants, please."
+    canvas.appendChild(nbd_info);
+
+    // Submit button
+    let sbmt = document.createElement('input');
+    sbmt.setAttribute("type" ,"submit");
+    sbmt.setAttribute("id" ,"sbmt");
+    sbmt.addEventListener('click', () => submit_default_branch(canvas))
+    sbmt.value = "Change default branch";
+    let txt = document.createTextNode('');
+    canvas.appendChild(kvpair(txt, sbmt));
+
+}
+
+function submit_default_branch(canvas) {
+    let repo = document.getElementById('repository').value;
+    let ndb = document.getElementById('default_branch').value;
+    // sanity checks
+    if (!repo.match(/^[a-z]+[a-z0-9./_-]{0,38}$/i)) {
+        alert(`Invalid default branch name "${repo}. Must conform to standard git branch naming syntax and must not be longer than 39 characters.`);
+        return
+    }
+    canvas.innerText = "Submitting change request, please wait...";
+
+    POST("api/defaultbranch.json", {repository: repo, default_branch: ndb}).then((js) => {
+        if (js.okay) {
+            canvas.innerText = "Default branch successfully changed!";
+        } else {
+            canvas.innerText = "An error occurred while attempting to change the default branch: " + js.message;
+        }
+    });
 }
