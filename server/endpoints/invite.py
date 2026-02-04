@@ -26,8 +26,14 @@ import aiohttp
 async def process(
         server: plugins.basetypes.Server, session: plugins.session.SessionObject, indata: dict
 ) -> dict:
+    # Cannot do anything without credentials, so check (once) first
+    if not session.credentials:
+        return {
+            "okay": False,
+            "message": "You need to be authed via GitHub before we can send an invite link to you.",
+        }
     # Administrative locking of account
-    if indata.get('lock') and session.credentials and session.credentials.admin:
+    if indata.get('lock') and session.credentials.admin:
         user_to_lock = indata.get('lock')
         for person in server.data.people:
             if person.asf_id == user_to_lock:
@@ -58,7 +64,7 @@ async def process(
             "message": "Could not unlink - account not found in database!",
         }
     # Unlinking personal account
-    if indata.get('unlink') and session.credentials:
+    if indata.get('unlink'):
         for person in server.data.people:
             if person.asf_id == session.credentials.uid:
                 print(f"Unlinking GitHub login from user {person.asf_id}")
@@ -102,7 +108,7 @@ async def process(
             "reauth": True,
             "message": "Could not invite to Org - missing numerical GitHub ID.",
         }
-    if session.credentials and session.credentials.github_login:
+    if session.credentials.github_login:
         invite_url = f"https://api.github.com/orgs/{server.config.github.org}/invitations"
         async with aiohttp.ClientSession() as httpsession:
             headers = {
