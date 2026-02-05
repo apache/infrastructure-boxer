@@ -833,8 +833,8 @@ function change_default_branch(canvas, login) {
     label.innerText = "New default branch: ";
     canvas.appendChild(kvpair(label, ndb));
     let ndb_info = document.createElement("p");
-    nbd_info.innerText = "Please enter the name of an existing branch to set as the default branch. Only type the branch name itself, no refs/heads/foo variants, please."
-    canvas.appendChild(nbd_info);
+    ndb_info.innerText = "Please enter the name of an existing branch to set as the default branch. Only type the branch name itself, no refs/heads/foo variants, please."
+    canvas.appendChild(ndb_info);
 
     // Submit button
     let sbmt = document.createElement('input');
