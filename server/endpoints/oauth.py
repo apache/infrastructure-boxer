@@ -56,7 +56,7 @@ async def process(
             ghid = person.github_login
             if person not in server.data.people:
                 server.data.people.append(person)
-        is_admin = person.asf_id in server.config.oauth.admins
+        is_admin = rv.get("isRoot", False)
         is_member = rv.get("isMember", False)
         cookie = await plugins.session.set_session(server, uid=rv["uid"], name=rv["fullname"], email=rv["email"], github_login=ghid, admin=is_admin, member=is_member)
         return aiohttp.web.Response(
