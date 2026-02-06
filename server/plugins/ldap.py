@@ -29,7 +29,9 @@ class LDAPConfig:
     ldapbase: str
     groupbase: str
 
-    def __init__(self, subyaml: dict = {}):
+    def __init__(self, subyaml: dict = None):
+        if dict is None: # default parameters persist between invocations; we don't want that here
+            dict = {}
         self.uri = str(subyaml.get("uri", ""))
         self.binddn = str(subyaml.get("binddn", ""))
         self.bindpw = str(subyaml.get("bindpw", ""))
