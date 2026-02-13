@@ -40,7 +40,9 @@ class Repository:
         # Determine project name from repo name:
         # incubator-foo-bar.git -> foo
         # httpd.blah.git -> httpd, etc.
-        m = re.match(r"^(?:incubator-)?(empire-db|[^-.]+)[-.]?.*(?:\.git)?$", self.filename)
+        # empire-db is added manually because their project name includes a hyphen
+        # INFRA-27355: terraform-provider was added as a possible prefix to conform with Hashicorp requirements
+        m = re.match(r"^(?:incubator-|terraform-provider-)?(empire-db|[^-.]+)[-.]?.*(?:\.git)?$", self.filename)
         if m:
             self.project = m.group(1)
         else:
