@@ -49,7 +49,7 @@ async def process(
         return {"okay": False, "message": "Invalid repository specified."}
 
     # Ensure right permissions
-    m = re.match(r"^(?:incubator-)?([a-z0-9]+)(-[-0-9a-z]+)?(\.git)?$", repo)  # httpd.git or sling-foo.git etc
+    m = re.match(r"^(?:incubator-|terraform-provider-)?([a-z0-9]+)(-[-0-9a-z]+)?(\.git)?$", repo)  # httpd.git or sling-foo.git etc
     if not m:
         return {"okay": False, "message": "Invalid repository name specified"}
     pmc = m.group(1)
