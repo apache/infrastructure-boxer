@@ -662,6 +662,9 @@ function prep_new_repo(refresh=false, submit=false) {
             project = 'incubator-' + project;
         }
     }
+    if (terraform_prefix.checked) {
+        project = 'terraform-provider-' + project;
+    }
     let repo_name = project;
     if (suffix && suffix.length) {
         repo_name += "-" + suffix;
