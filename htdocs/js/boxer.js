@@ -545,6 +545,18 @@ function new_repo_prompt(canvas, login) {
     label.innerText = "Include incubator prefix: ";
     canvas.appendChild(kvpair(label, incubator));
 
+    // Terraform Provider Prefix?
+    canvas.appendChild(br());
+    let terraform = document.createElement('input');
+    terraform.setAttribute("type" , "checkbox");
+    terraform.setAttribute("id" , "terraform_prefix");
+    terraform.setAttribute("onchange", "prep_new_repo();")
+    terraform.setAttribute("checked", true);
+    label = document.createElement('label');
+    label.setAttribute("for", "terraform_prefix");
+    label.innerText = "Include Terraform prefix: ";
+    canvas.appendChild(kvpair(label, terraform));
+
     // Private?
     if (login_cached.credentials.admin || login_cached.credentials.tooling) {
         canvas.appendChild(br());
@@ -631,6 +643,7 @@ function prep_new_repo(refresh=false, submit=false) {
     let repo_commit = document.getElementById('commit').value;
     let repo_dev = document.getElementById('dev').value;
     let incubator_prefix = document.getElementById('incubator_prefix');
+    let terraform_prefix = document.getElementById('terraform_prefix');
     document.getElementById('sbmt').disabled = true;
     if (!project.length) {
         frn.innerText = "Please select a project";
