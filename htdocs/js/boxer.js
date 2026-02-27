@@ -539,7 +539,6 @@ function new_repo_prompt(canvas, login) {
     incubator.setAttribute("type" , "checkbox");
     incubator.setAttribute("id" , "incubator_prefix");
     incubator.setAttribute("onchange", "prep_new_repo();")
-    incubator.setAttribute("checked", true);
     label = document.createElement('label');
     label.setAttribute("for", "iincubator_prefix");
     label.innerText = "Include incubator prefix: ";
@@ -551,7 +550,6 @@ function new_repo_prompt(canvas, login) {
     terraform.setAttribute("type" , "checkbox");
     terraform.setAttribute("id" , "terraform_prefix");
     terraform.setAttribute("onchange", "prep_new_repo();")
-    terraform.setAttribute("checked", true);
     label = document.createElement('label');
     label.setAttribute("for", "terraform_prefix");
     label.innerText = "Include Terraform prefix: ";
