@@ -533,17 +533,6 @@ function new_repo_prompt(canvas, login) {
     label.innerText = "Optional repo sub-name: ";
     canvas.appendChild(kvpair(label, suffix));
 
-    // Incubator Prefix?
-    canvas.appendChild(br());
-    let incubator = document.createElement('input');
-    incubator.setAttribute("type" , "checkbox");
-    incubator.setAttribute("id" , "incubator_prefix");
-    incubator.setAttribute("onchange", "prep_new_repo();")
-    label = document.createElement('label');
-    label.setAttribute("for", "iincubator_prefix");
-    label.innerText = "Include incubator prefix: ";
-    canvas.appendChild(kvpair(label, incubator));
-
     // Terraform Provider Prefix?
     canvas.appendChild(br());
     let terraform = document.createElement('input');
@@ -640,7 +629,6 @@ function prep_new_repo(refresh=false, submit=false) {
     let repo_title = 'Apache ' + project;
     let repo_commit = document.getElementById('commit').value;
     let repo_dev = document.getElementById('dev').value;
-    let incubator_prefix = document.getElementById('incubator_prefix');
     let terraform_prefix = document.getElementById('terraform_prefix');
     document.getElementById('sbmt').disabled = true;
     if (!project.length) {
@@ -655,10 +643,8 @@ function prep_new_repo(refresh=false, submit=false) {
         frn.innerText = "Invalid repository suffix. Must be lowercase alphanumeric characters or dashes only.";
         return
     }
-    if (login_cached.podlings.includes(project)) {
-        if (incubator_prefix.checked) {
-            project = 'incubator-' + project;
-        }
+    if (incubator_prefix.checked) {
+        project = 'terraform-provider-' + project;
     }
     let repo_name = project;
     if (suffix && suffix.length) {
