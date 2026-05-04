@@ -864,8 +864,8 @@ function submit_default_branch(canvas) {
     let repo = document.getElementById('repository').value;
     let ndb = document.getElementById('default_branch').value;
     // sanity checks
-    if (!nbd.match(/^[a-z]+[a-z0-9./_-]{0,38}$/i)) {
-        alert(`Invalid default branch name "${nbd}". Must conform to standard git branch naming syntax and must not be longer than 39 characters.`);
+    if (!ndb.match(/^[a-z]+[a-z0-9./_-]{0,38}$/i)) {
+        alert(`Invalid default branch name "${ndb}". Must conform to standard git branch naming syntax and must not be longer than 39 characters.`);
         return
     }
     canvas.innerText = "Submitting change request, please wait...";
