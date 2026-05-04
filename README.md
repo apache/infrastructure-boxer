@@ -4,4 +4,4 @@ The ASF Infrastructure Boxer Application provides services for ASF committers an
 - a [list of Apache GitHub repositories](https://gitbox.apache.org/repos/asf), original or mirrored, with links to their logs.
 - [Boxer](https://gitbox.apache.org/boxer/), a tool providing
   - account management: associate a user's Git account with their ASF account.
-  - repository management: easily create a new Git repository within the ASF system.
+  - repository management: easily create a new Git repository within the ASF system, and sync repositories and teams to GitHub
