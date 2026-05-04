@@ -24,6 +24,7 @@ import re
 import asfpy.messaging
 
 ADMIN_ADDITIONAL_PROJECTS = ["infrastructure", "members", "board", "foundation"]
+EXEC_ADDITIONAL_PROJECTS = ["members", "board", "foundation"]
 
 """ GitHub/GitBox default branch mgmt endpoint for Boxer """
 
