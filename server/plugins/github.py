@@ -9,9 +9,9 @@ import time
 
 GRAPHQL_URL = "https://api.github.com/graphql"
 DEBUG = False  # Set to True to disable GitHub API calls
-GITHUB_RESULTS_PER_QUERY = 40  # Number of results to gather per paginated result. 
+GITHUB_RESULTS_PER_QUERY = 25  # Number of results to gather per paginated result. 
                                # Default is 100, but due to recent issues with timeouts, 
-                               # we have lowered it to 40.
+                               # we have lowered it to 25.
 
 
 class GitHubOrganisation:
