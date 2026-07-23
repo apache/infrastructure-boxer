@@ -177,7 +177,7 @@ async def run_tasks(server: plugins.basetypes.Server):
             try:
                 tmp_teams = await asf_github_org.load_teams()
                 server.data.teams = tmp_teams
-            except (AssertionError, TypeError, ContentTypeError, ClientPayloadError, plugins.github.GitHubError) as e:
+            except (AssertionError, TypeError, ContentTypeError, ClientPayloadError) as e:
                 print("Invalid response from GitHub while trying to fetch latest teams, will use cached response:")
                 print(e)
         if server.data.teams: 
