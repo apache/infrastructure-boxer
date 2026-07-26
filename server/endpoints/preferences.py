@@ -28,13 +28,17 @@ async def process(
     server: plugins.basetypes.Server, session: plugins.session.SessionObject, indata: dict
 ) -> dict:
     github_data = None
+    my_projects: list = []
+    public_optin: list = []
 
     in_github_org = False
     if session.credentials and session.credentials.github_login in server.data.mfa:
         in_github_org = True
     if session.credentials:
+        public_optin = list(sorted(server.data.public_optin.get(session.credentials.uid, [])))
         for p in server.data.people:
             if p.asf_id == session.credentials.uid:
+                my_projects = list(sorted(x.name for x in p.projects if p in x.committers and x.public_repos))
                 github_data = {
                     "repositories": [x.filename for x in p.repositories if x.filename in server.data.github_repos],
                     "private": [x.filename for x in p.repositories if x.private and x.filename in server.data.github_repos],
@@ -58,7 +62,7 @@ async def process(
             pmcs = list(sorted(pmcs))
         is_tooling = session.credentials.uid in server.data.pmcs.get("tooling", {})
 
-    prefs: dict = {"credentials": {}, "github": github_data, "pmcs": pmcs, "all_projects": list(sorted(all_projects)), "podlings": server.data.podlings}
+    prefs: dict = {"credentials": {}, "github": github_data, "pmcs": pmcs, "all_projects": list(sorted(all_projects)), "podlings": server.data.podlings, "projects": my_projects, "public_optin": public_optin}
     if session and session.credentials:
         prefs['credentials'] = {
             "admin": session.credentials.admin,

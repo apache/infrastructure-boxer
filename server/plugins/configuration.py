@@ -74,4 +74,5 @@ class InterData:
         self.teams: typing.List[plugins.github.GitHubTeam] = []
         self.pmcs = {}
         self.podlings = []
+        self.public_optin: typing.Dict[str, typing.Set[str]] = {}
 
