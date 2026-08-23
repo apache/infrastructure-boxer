@@ -187,10 +187,10 @@ function show_page_profile(canvas, login) {
                 let repo = login.github.repositories[i];
                 const ghlink = `https://github.com/${gh_org}/${repo}`;
                 let gblink = `https://gitbox.apache.org/repos/asf/${repo}.git`;
-                let private = false;
+                let privateRepo = false;
                 let archived = login.github.metadata[repo].archived;
                 if (login.github.private.includes(repo)) {
-                    private = true;
+                    privateRepo = true;
                     let m = repo.match(/^(?:incubator-)?(empire-db|[^-.]+)-?.*/);
                     if (m) {
                         const project = m[1];
@@ -201,7 +201,7 @@ function show_page_profile(canvas, login) {
                 repospan.style.display = "inline-block";
                 repospan.style.width = "480px";
                 repospan.innerText = repo + ".git";
-                repospan.style.color = private ? "red" : "black";
+                repospan.style.color = privateRepo ? "red" : "black";
                 if (archived) {
                     repospan.style.color = "grey";
                     repospan.style.textDecoration = "line-through";
@@ -221,8 +221,8 @@ function show_page_profile(canvas, login) {
                 visispan.style.marginLeft = "20px";
                 visispan.style.width = "8rem";
                 visispan.style.display = "inline-block";
-                visispan.innerText = private ? "Private repository" : "Public repository";
-                visispan.style.color = private ? "red" : "black";
+                visispan.innerText = privateRepo ? "Private repository" : "Public repository";
+                visispan.style.color = privateRepo ? "red" : "black";
                 const desc = document.createElement('span');
                 desc.style.display = "inline-block";
                 desc.style.width = "520px";
@@ -256,6 +256,71 @@ function show_page_profile(canvas, login) {
         canvas.appendChild(a);
         canvas.appendChild(document.createElement('br'));
         canvas.appendChild(document.createTextNode("It may take up to five minutes for Boxer to recognize your MFA being enabled."));
+    }
+
+    public_optin_section(canvas, login);
+}
+
+
+function public_optin_section(canvas, login) {
+    if (!login.projects || login.projects.length == 0) return;
+
+    canvas.appendChild(h2("Project team listing"));
+    let blurb = document.createElement('p');
+    blurb.style.maxWidth = "800px";
+    blurb.innerText = `Which projects you work on is personal information, so we only list it if you ask us to. Ticking a project adds you to its GitHub team, which is visible to members of the ${gh_org} GitHub organization - not to the wider internet. These teams exist so they can be named as approvers on GitHub Actions deployment environments. Untick a project to be removed from its team again.`;
+    canvas.appendChild(blurb);
+
+    let ul = document.createElement('ul');
+    ul.setAttribute('class', 'striped');
+    ul.style.maxWidth = "800px";
+    for (let project of login.projects) {
+        let cb = document.createElement('input');
+        cb.setAttribute('type', 'checkbox');
+        cb.setAttribute('id', `optin_${project}`);
+        cb.setAttribute('class', 'optin');
+        cb.value = project;
+        cb.checked = login.public_optin.includes(project);
+        let label = document.createElement('label');
+        label.setAttribute('for', `optin_${project}`);
+        label.innerText = ` ${project} - list me in ${gh_org}/${project}-public`;
+        let li = document.createElement('li');
+        li.appendChild(cb);
+        li.appendChild(label);
+        ul.appendChild(li);
+    }
+    canvas.appendChild(ul);
+
+    let sbmt = document.createElement('input');
+    sbmt.setAttribute('type', 'submit');
+    sbmt.setAttribute('id', 'optin_submit');
+    sbmt.addEventListener('click', save_public_optin);
+    sbmt.value = "Save team listing preferences";
+    canvas.appendChild(sbmt);
+
+    let result = document.createElement('div');
+    result.setAttribute('id', 'optin_result');
+    result.style.padding = '10px';
+    result.style.color = 'blue';
+    canvas.appendChild(result);
+}
+
+
+async function save_public_optin() {
+    let projects = [];
+    for (let cb of document.getElementsByClassName('optin')) {
+        if (cb.checked) projects.push(cb.value);
+    }
+    let result = document.getElementById('optin_result');
+    result.innerText = "Saving your preferences, please wait...";
+    try {
+        let rv = await POST("api/optin.json", {projects: projects});
+        result.innerText = rv.message;
+        if (rv.okay) {
+            login_cached.public_optin = projects;
+        }
+    } catch (e) {
+        result.innerText = "Something went wrong while saving your preferences. Please reload this page to check which projects you are currently listed in.";
     }
 }
 

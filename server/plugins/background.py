@@ -52,6 +52,22 @@ async def adjust_teams(server: plugins.basetypes.Server):
                 else:
                     print(f"Could not find an ASF project for team {team.slug}!!")
 
+            # Org-visible team listing opt-in groups.
+            # Deliberately not gated on public_repos: a project losing its public repos must not
+            # strand someone in a visible team after they opted out.
+            elif team.type == "public":
+                asf_project = server.data.projects.get(team.project)
+                if asf_project:
+                    ldap_github_team = asf_project.public_optin_github_team(server.data.public_optin, server.data.mfa)
+                    if asf_project.committers:  # Only set if we got LDAP data back
+                        added, removed = await team.set_membership(ldap_github_team)
+                        if added:
+                            print(f"Added {len(added)} members to team {team.slug}: {', '.join(added)}")
+                        if removed:
+                            print(f"Removed {len(removed)} members from team {team.slug}: {', '.join(removed)}")
+                else:
+                    print(f"Could not find an ASF project for team {team.slug}!!")
+
             # PMC Groups
             elif team.type == "private":
                 asf_project = server.data.projects.get(team.project)
@@ -144,6 +160,11 @@ async def run_tasks(server: plugins.basetypes.Server):
         async with ProgTimer("Gathering list of repositories on GitHub"):
             server.data.github_repos = await asf_github_org.load_repositories()
             print(f"Found {len(server.data.github_repos)} repositories on GitHub")
+        async with ProgTimer("Loading team listing opt-ins"):
+            try:
+                server.data.public_optin = plugins.projects.load_public_optin(server.database.client)
+            except Exception as e:
+                print("Could not load team listing opt-ins, keeping the ones already in memory: %s" % e)
         async with ProgTimer("Compiling list of projects, repos and memberships"):
             try:
                 asf_org = await plugins.projects.compile_data(
@@ -164,6 +185,14 @@ async def run_tasks(server: plugins.basetypes.Server):
             except Exception as e:
                 print("Could not fetch repositories - ldap source down or not connected: %s" % e)
 
+        async with ProgTimer("Expiring team listing opt-ins for former committers"):
+            try:
+                plugins.projects.expire_public_optin(
+                    server.database.client, server.data.projects, server.data.public_optin
+                )
+            except Exception as e:
+                print("Could not expire team listing opt-ins: %s" % e)
+
         async with ProgTimer("Adjusting MFA status for users"):
             for person in server.data.people:
                 if person.github_login and person.github_login in server.data.mfa:
@@ -183,7 +212,7 @@ async def run_tasks(server: plugins.basetypes.Server):
         if server.data.teams: 
             async with ProgTimer("Looking for missing/invalid GitHub teams"):
                 try:
-                    await asf_github_org.setup_teams(server.data.projects)
+                    await asf_github_org.setup_teams(server.data.projects, server.data.public_optin, server.data.mfa)
                 except AssertionError as e:
                     print("Got an AssertionError while trying to set up GitHub teams, will try again later:")
                     print(e)
