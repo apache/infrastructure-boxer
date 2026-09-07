@@ -1,0 +1,6 @@
+node_modules/
+.vite/
+
+# dist/ is intentionally committed: the Boxer front-end is deployed by serving
+# the built files straight out of the repository, the same way htdocs/ was.
+# If the deployment ever grows a build step, ignore dist/ here instead.
