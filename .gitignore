@@ -133,3 +133,6 @@ dmypy.json
 
 # Don't copy live boxer.yaml
 server/boxer.yaml
+
+# webui build output is committed, unlike the Python dist/ above
+!webui/dist/
