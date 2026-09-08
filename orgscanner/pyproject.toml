@@ -1,0 +1,36 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with this
+# work for additional information regarding copyright ownership.  The ASF
+# licenses this file to you under the Apache License, Version 2.0.
+
+[project]
+name = "boxer-orgscanner"
+version = "1.0.0"
+description = "GitHub organization scanner for the ASF Infrastructure Boxer suite"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Apache Software Foundation Infrastructure" }]
+dependencies = [
+    "aiohttp>=3.9",
+    "PyYAML>=6.0.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "mypy>=1.11",
+    "types-PyYAML>=6.0",
+]
+
+[tool.uv]
+# The scanner is run in place (`python -m orgscanner` from the checkout root, or
+# orgscanner/scan.py), not installed, so uv only needs to manage the venv.
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true

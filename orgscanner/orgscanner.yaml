@@ -1,0 +1,120 @@
+# Sample configuration file for the Boxer GitHub organization scanner.
+#
+# Fill in the token and run:
+#
+#   uv run orgscanner/scan.py --config orgscanner/orgscanner.yaml --once
+#
+# A copy with a real token in it belongs outside the checkout, or should use
+# token_file/token_env below.
+
+github:
+  # Personal access token used for all scans. It needs read:org, and it has to
+  # belong to an organization owner, as GitHub only reports 2FA status to
+  # owners. Classic and fine-grained tokens both work.
+  token: your_token_here
+  # Alternatives, for keeping the token out of this file. The first of these
+  # that has a value wins: token, token_file, token_env, $GITHUB_TOKEN.
+  #token_file: /etc/boxer/orgscanner.token
+  #token_env: BOXER_SCANNER_TOKEN
+  #graphql_url: https://api.github.com/graphql
+
+output:
+  # Where the $org-$timestamp.yaml snapshots are written. Relative paths are
+  # resolved against the directory holding this configuration file.
+  directory: ./data
+  # How many snapshots to keep per organization. Older ones are rotated out
+  # after every successful scan.
+  keep_files: 10
+  # strftime format for the $timestamp part of the filename (UTC).
+  timestamp_format: "%Y%m%dT%H%M%SZ"
+  # Also maintain a $org-latest.yaml symlink pointing at the newest snapshot.
+  # It is excluded from rotation, so it never counts against keep_files.
+  latest_symlink: true
+
+scan:
+  # Organizations to scan, by login/slug.
+  organizations:
+    - apache
+    - asfsandbox
+
+  # Teams to include in the results. Listing every team in the organization is
+  # cheap, so each team's slug and display name are fnmatch'ed against these
+  # patterns, and the ones that match get their member lists fetched.
+  team_patterns:
+    - "*-committers"
+    - "*-private"
+    - "*-public"
+
+  # Seconds between scan rounds, measured from the end of the previous round.
+  # With the caching below, scanning an organization the size of apache for an
+  # hour costs a fraction of the 5000 point hourly GraphQL budget, so 900 is a
+  # reasonable place to start.
+  interval: 900
+  # Random extra delay of up to this many seconds between rounds, so that two
+  # scanners sharing a token do not line up.
+  jitter: 60
+  # Every Nth round ignores the cache and re-reads everything, which is what
+  # reconciles deletions: a removed repository or team leaves no trace in an
+  # incremental sweep. Set to 0 to turn periodic full scans off. The first scan
+  # against an empty cache is a full one either way.
+  full_scan_every: 12
+  # Seconds to pause between organizations within a round.
+  organization_delay: 0
+
+performance:
+  # Nodes per page. 100 is GitHub's maximum and costs the least per node, but
+  # GitHub is likelier to time out on a large page for a big organization. The
+  # scanner halves a page size when that happens and grows it back on success,
+  # so these are starting points rather than fixed settings.
+  member_page_size: 100
+  team_page_size: 50
+  team_member_page_size: 100
+  repository_page_size: 100
+  # Never shrink a page below this on repeated timeouts.
+  min_page_size: 5
+
+  # How many teams to request per GraphQL document, using field aliases. On an
+  # organization with thousands of teams this saves the most time of anything
+  # here: 20 teams per request instead of one.
+  team_batch_size: 20
+
+  # Concurrent in-flight GraphQL requests. Members, teams and repositories are
+  # swept in parallel, as are team batches within a sweep, so 4 keeps the
+  # connection busy without provoking GitHub's secondary rate limits.
+  concurrency: 4
+  # Minimum seconds between requests, for when GitHub starts complaining about
+  # secondary rate limits. 0 turns pacing off.
+  min_request_interval: 0
+  # Per-request socket read timeout, in seconds.
+  request_timeout: 60
+  # Attempts per query before giving up, and the exponential backoff base.
+  max_retries: 6
+  retry_backoff: 2.0
+  # Park the scanner until the budget resets once this many points or fewer are
+  # left of the hourly GraphQL budget. This is the headroom left for Boxer's own
+  # GitHub traffic on the same token.
+  rate_limit_reserve: 250
+  # Cap on any single sleep, in seconds. A GraphQL budget resets hourly.
+  max_sleep: 3900
+
+cache:
+  enabled: true
+  # Defaults to a .cache directory inside output.directory.
+  #directory: /var/cache/boxer-orgscanner
+  # A cached record older than its TTL is re-read even when nothing looks
+  # changed, which puts a bound on how stale the results can be. GitHub has no
+  # cheap "changed since" signal for organization membership, and therefore
+  # none for 2FA status, or for team membership, so these TTLs are what catch
+  # changes to those.
+  member_ttl: 3600
+  team_ttl: 3600
+  # Repositories are swept newest-updated-first, and the sweep stops at the
+  # last scan's high-water mark, so this TTL can be generous.
+  repository_ttl: 21600
+  # Rewind the incremental repository cutoff by this many seconds, to absorb
+  # clock skew between GitHub and this host.
+  incremental_overlap: 300
+
+logging:
+  # debug, info, warning or error.
+  level: info

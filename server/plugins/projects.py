@@ -5,6 +5,48 @@ import typing
 import datetime
 
 
+def load_public_optin(dbhandle: asfpy.sqlite.DB) -> typing.Dict[str, typing.Set[str]]:
+    """Reads every team listing opt-in as a dict of asf id -> set of projects opted into"""
+    optin: typing.Dict[str, typing.Set[str]] = {}
+    for row in dbhandle.fetch("publicoptin", limit=None):
+        optin.setdefault(row["asfid"], set()).add(row["project"])
+    return optin
+
+
+def save_public_optin(
+    dbhandle: asfpy.sqlite.DB, asf_id: str, scope: typing.Set[str], projects: typing.Iterable[str]
+):
+    """Records a person's opt-in choice for every project in scope, leaving opt-ins outside it alone.
+       Only rows that actually change are touched, so a failure part way through cannot wipe the rest."""
+    current = set(row["project"] for row in dbhandle.fetch("publicoptin", limit=None, asfid=asf_id))
+    for project in sorted(scope):
+        if project in projects and project not in current:
+            dbhandle.insert(
+                "publicoptin",
+                {"asfid": asf_id, "project": project, "updated": datetime.datetime.now()},
+            )
+        elif project not in projects and project in current:
+            dbhandle.delete("publicoptin", asfid=asf_id, project=project)
+
+
+def expire_public_optin(
+    dbhandle: asfpy.sqlite.DB,
+    projects: typing.Dict[str, "Project"],
+    optin: typing.Dict[str, typing.Set[str]],
+):
+    """Drops opt-ins for people who are no longer committers, so that rejoining a project later
+       cannot silently list them again without asking. Projects we have no LDAP data for are skipped."""
+    for asf_id, opted in sorted(optin.items()):
+        for name in sorted(opted):
+            project = projects.get(name)
+            if not project or not project.committers:
+                continue
+            if asf_id not in project.committers:
+                print(f"Expiring team listing opt-in for {asf_id} on {name}: no longer a committer")
+                dbhandle.delete("publicoptin", asfid=asf_id, project=name)
+                opted.discard(name)
+
+
 class Committer:
     def save(self, dbhandle: asfpy.sqlite.DB):
         document = {
@@ -102,6 +144,21 @@ class Project:
         """Returns the GitHub IDs of everyone that should be on the GitHub private team for this project"""
         team_ids = set()
         for committer in self.pmc:
+            if mfa:
+                if mfa.get(committer.github_login):
+                    team_ids.add(committer.github_login)
+            elif committer.github_mfa:
+                team_ids.add(committer.github_login)
+        return list(team_ids)
+
+    def public_optin_github_team(self, opted_in: typing.Dict[str, typing.Set[str]], mfa = None):
+        """Returns the GitHub IDs of everyone that has opted into being listed in this project's
+           org-visible team. This is the only predicate for that team, so creating it and filling
+           it can never disagree on who belongs."""
+        team_ids = set()
+        for committer in self.committers:
+            if self.name not in opted_in.get(committer.asf_id, ()):
+                continue
             if mfa:
                 if mfa.get(committer.github_login):
                     team_ids.add(committer.github_login)

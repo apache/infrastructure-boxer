@@ -34,6 +34,7 @@ import plugins.basetypes
 import plugins.configuration
 import plugins.database
 import plugins.formdata
+import plugins.projects
 import plugins.session
 
 BOXER_VERSION = "0.1.0"
@@ -52,6 +53,7 @@ class Server(plugins.basetypes.Server):
         self.data = plugins.configuration.InterData()
         self.handlers = dict()
         self.database = plugins.database.Database(self.config.database)
+        self.data.public_optin = plugins.projects.load_public_optin(self.database.client)
         self.server = None
 
         # Load each URL endpoint

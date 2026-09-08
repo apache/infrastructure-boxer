@@ -9,9 +9,9 @@ import time
 
 GRAPHQL_URL = "https://api.github.com/graphql"
 DEBUG = False  # Set to True to disable GitHub API calls
-GITHUB_RESULTS_PER_QUERY = 40  # Number of results to gather per paginated result. 
+GITHUB_RESULTS_PER_QUERY = 20  # Number of results to gather per paginated result. 
                                # Default is 100, but due to recent issues with timeouts, 
-                               # we have lowered it to 40.
+                               # we have lowered it to 20.
 
 
 class GitHubOrganisation:
@@ -322,13 +322,14 @@ class GitHubOrganisation:
         print("%d with 2FA, %d without!" % (mfa_enabled, mfa_disabled))
         return mfa
 
-    async def add_team(self, project: str, role: str = "committers") -> typing.Optional[int]:
+    async def add_team(self, project: str, role: str = "committers", privacy: str = "secret") -> typing.Optional[int]:
         """Adds a new GitHub team to the organization"""
         assert self.orgid, "Parent GitHubOrganization needs a call to .get_id() prior to membership updates!"
         assert project, "GitHub team needs a name to be added to the organization"
         url = f"https://api.github.com/orgs/{self.login}/teams"
         data = {
             "name": f"{project} {role}",
+            "privacy": privacy,
         }
         txt = await self.api_post(url, jsdata=data)
         if txt:
@@ -340,7 +341,12 @@ class GitHubOrganisation:
         else:
             raise AssertionError("Github did not respond with a JSON payload!!")
 
-    async def setup_teams(self, projects: typing.Dict[str, plugins.projects.Project]):
+    async def setup_teams(
+        self,
+        projects: typing.Dict[str, plugins.projects.Project],
+        opted_in: typing.Dict[str, typing.Set[str]],
+        mfa: typing.Optional[dict] = None,
+    ):
         """Looks for and sets up missing teams on GitHub"""
         for project in projects.values():
 
@@ -376,6 +382,29 @@ class GitHubOrganisation:
                         "databaseId": teamid,
                         "slug": private_team.replace(" ", "-"),
                         "name": private_team,
+                        "members": {
+                            "edges": []
+                        },
+                        "repositories": {
+                            "edges": []
+                        },
+                    },
+                }
+                newteam = GitHubTeam(self, nodedata)
+                self.teams.append(newteam)
+
+            # Check if an org-visible team needs to be made for the people who opted into being listed
+            public_team = f"{project.name} public"
+            if (project.public_repos and project.public_optin_github_team(opted_in, mfa)
+                    and public_team not in self.teams):
+                print(f"Team '{project.name} public' was not found on GitHub, setting it up for the first time.")
+                # Must stay 'closed'; GitHub rejects secret teams as deployment environment approvers
+                teamid = await self.add_team(project.name, "public", privacy="closed")
+                nodedata = {
+                    "node": {
+                        "databaseId": teamid,
+                        "slug": public_team.replace(" ", "-"),
+                        "name": public_team,
                         "members": {
                             "edges": []
                         },

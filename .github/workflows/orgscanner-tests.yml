@@ -1,0 +1,27 @@
+name: Org Scanner Tests
+
+on:
+  push:
+    paths:
+      - "orgscanner/**"
+      - ".github/workflows/orgscanner-tests.yml"
+  pull_request:
+    paths:
+      - "orgscanner/**"
+      - ".github/workflows/orgscanner-tests.yml"
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
+        with:
+          enable-cache: true
+
+      - name: Type check
+        run: uv run --project orgscanner mypy --config-file orgscanner/pyproject.toml orgscanner
+
+      - name: Run tests
+        run: uv run --project orgscanner pytest orgscanner/tests -v

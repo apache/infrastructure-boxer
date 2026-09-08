@@ -1,0 +1,18 @@
+{
+  "name": "boxer-webui",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Front-end for the ASF Infrastructure Boxer service",
+  "license": "Apache-2.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.3.0",
+    "svelte": "^5.57.0",
+    "vite": "^8.2.2"
+  }
+}
