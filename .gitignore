@@ -137,3 +137,8 @@ server/boxer.yaml
 # webui source and build output are committed; the Python build/dist/lib rules above must not swallow them
 !webui/dist/
 !webui/src/lib/
+
+# orgscanner scan output and cache (the sample orgscanner.yaml is committed,
+# a live one with a real token should not be)
+orgscanner/data/
+orgscanner/orgscanner.local.yaml
