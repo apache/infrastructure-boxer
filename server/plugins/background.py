@@ -88,7 +88,7 @@ async def adjust_repositories(server: plugins.basetypes.Server):
     """Adjusts repositories, adding/removing disparities between GitBox and GitHub"""
     async with ProgTimer("Adjusting GitHub team repositories according to gitbox repos"):
         for team in server.data.teams:
-            if team.type == "committers":
+            if team.type == "committers" or team.type == "public":
                 asf_project = server.data.projects.get(team.project)
                 if asf_project:
                     managed_repos = [
