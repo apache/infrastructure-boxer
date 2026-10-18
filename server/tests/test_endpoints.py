@@ -192,3 +192,38 @@ def test_default_branch_updates_github_and_the_gitbox_head(monkeypatch, tmp_path
     assert patched == [("https://api.github.com/repos/apache/httpd", {"default_branch": "main"})]
     assert (repo_dir / "HEAD").read_text() == "ref: refs/heads/main"
     assert mails and mails[0]["recipients"] == ["private@httpd.apache.org"]
+
+
+@pytest.mark.parametrize("branch", ["8.0.x", "_integration", "release+metadata", "x" * 50])
+def test_default_branch_accepts_valid_git_branch_names(monkeypatch, branch, tmp_path):
+    patched = stub_github_org(monkeypatch)
+    monkeypatch.setattr(asfpy.messaging, "mail", lambda **kwargs: None)
+    server = FakeServer()
+    repo_dir = tmp_path / "httpd.git"
+    repo_dir.mkdir()
+    server.data.repositories = [FakeRepo("httpd", str(repo_dir))]
+    rv = asyncio.run(
+        endpoints.defaultbranch.process(
+            server, make_session(admin=True), {"repository": "httpd", "default_branch": branch}
+        )
+    )
+    assert rv["okay"] is True
+    assert patched == [("https://api.github.com/repos/apache/httpd", {"default_branch": branch})]
+    assert (repo_dir / "HEAD").read_text() == f"ref: refs/heads/{branch}"
+
+
+@pytest.mark.parametrize("branch", [None, "", ["main"], "main\n", "main\nref: refs/heads/x", "ma in", "main\t", "main\x7f"])
+def test_default_branch_rejects_invalid_names(monkeypatch, branch, tmp_path):
+    monkeypatch.setattr(plugins.github, "GitHubOrganisation", lambda **kwargs: pytest.fail("GitHub must not be called"))
+    server = FakeServer()
+    repo_dir = tmp_path / "httpd.git"
+    repo_dir.mkdir()
+    (repo_dir / "HEAD").write_text("ref: refs/heads/main")
+    server.data.repositories = [FakeRepo("httpd", str(repo_dir))]
+    rv = asyncio.run(
+        endpoints.defaultbranch.process(
+            server, make_session(admin=True), {"repository": "httpd", "default_branch": branch}
+        )
+    )
+    assert rv["okay"] is False
+    assert (repo_dir / "HEAD").read_text() == "ref: refs/heads/main"

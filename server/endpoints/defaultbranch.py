@@ -36,7 +36,8 @@ async def process(
         return {"okay": False, "message": "You need to be logged in to access this endpoint."}
     
     new_default_branch = indata.get("default_branch")
-    if not new_default_branch:
+    # Git forbids control characters and spaces in ref names; this also keeps the HEAD file to a single line.
+    if not isinstance(new_default_branch, str) or not new_default_branch or re.search(r"[\x00-\x20\x7f]", new_default_branch):
         return {"okay": False, "message": "Invalid branch name specified."}
 
     # Ensure repo exists

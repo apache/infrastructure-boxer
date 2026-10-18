@@ -929,7 +929,7 @@ function submit_default_branch(canvas) {
     let repo = document.getElementById('repository').value;
     let ndb = document.getElementById('default_branch').value;
     // sanity checks
-    if (!ndb.match(/^[a-z]+[a-z0-9./_-]{0,38}$/i)) {
+    if (!ndb.match(/^[a-z0-9]+[a-z0-9./_-]{0,38}$/i)) {
         alert(`Invalid default branch name "${ndb}". Must conform to standard git branch naming syntax and must not be longer than 39 characters.`);
         return
     }

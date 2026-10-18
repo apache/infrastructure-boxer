@@ -28,8 +28,8 @@ the License.
   let submitting = $state(false);
   let result = $state(null);
 
-  // Same rule the backend enforces: a git branch name, at most 39 characters.
-  const branchValid = $derived(/^[a-z]+[a-z0-9./_-]{0,38}$/i.test(branch));
+  // Client-side sanity check only; the backend rejects empty names, spaces and control characters, and GitHub rejects branches that don't exist.
+  const branchValid = $derived(/^[a-z0-9]+[a-z0-9./_-]{0,38}$/i.test(branch));
   const ready = $derived(Boolean(repository) && branchValid);
 
   async function submit() {
